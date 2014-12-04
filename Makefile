@@ -1,7 +1,7 @@
 ROOTFLAGS = $(shell root-config --cflags)
 ROOTLIBS  = $(shell root-config --libs)
 
-all: Neuron.o Brain.o
+all: Neuron.o Brain.o Entity.o
 
 clean:
 	rm -rf lib/*.o
@@ -13,4 +13,8 @@ Neuron.o: src/Neuron.cc
 Brain.o: src/Brain.cc
 	c++ -c src/Brain.cc -c $(ROOTFLAGS)
 	mv Brain.o lib/
+
+Entity.o: src/Entity.cc
+	c++ -c src/Entity.cc -c $(ROOTFLAGS)
+	mv Entity.o lib/
 
