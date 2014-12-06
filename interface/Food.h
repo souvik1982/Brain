@@ -12,6 +12,8 @@ ALL RIGHTS RESERVED
 =================================================
 */
 
+#include "Entity.h"
+
 class Food: public Entity
 {
   public:

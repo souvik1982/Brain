@@ -12,6 +12,8 @@ ALL RIGHTS RESERVED
 =================================================
 */
 
+#include "Entity.h"
+
 class Fire: public Entity
 {
   public:

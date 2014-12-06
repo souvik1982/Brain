@@ -173,7 +173,7 @@ class Brain
     TH1F *h_potentials_;
     TH2F *h_synapticStrengths_, *h_distances_;
     TH1F *h_connectivities_;
-    // std::vector<double> x_neuron_, y_neuron_;
+    std::vector<double> x_neuron_, y_neuron_;
     
     Brain(int size)
     {
@@ -208,9 +208,9 @@ class Brain
         h_potentials_->Fill(i+1);
         
         // Arrange the neurons initially on a circle of radius 100
-        // x_neuron_=100.+100.*cos(theta);
-        // y_neuron_=100.+100.*sin(theta);
-        // theta+=2.*pi/double(size);
+        x_neuron_.push_back(100.+100.*cos(theta));
+        y_neuron_.push_back(100.+100.*sin(theta));
+        theta+=2.*pi/double(size);
       }
     }
     
@@ -275,8 +275,43 @@ class Brain
       h_connectivities_->Draw();
     }
     
-    void drawBrainMap()
+    void drawBrainMap(TCanvas *c)
     {
+    
+      // Relaxation
+      bool relax=true;
+      while (relax==true)
+      {
+        relax=false;
+        for (unsigned int i=0; i<neurons.size(); ++i)
+        {
+          NeuralRelations *neuralRelations=&(neurons.at(i)->neuralRelations_);
+          for (unsigned int j=0; j<neuralRelations->size(); ++j)
+          {
+            double k=neuralRelations->at(j)->distance;
+            double l=neuralRelations->at(j)->index;
+            double F_x=-(x_neuron_.at(i)-x_neuron_.at(l))*k;
+            double F_y=-(y_neuron_.at(i)-y_neuron_.at(l))*k;
+            if (F_x>2 && F_y>2)
+            {
+              x_neuron_.at(i)+=F_x;
+              y_neuron_.at(i)+=F_y;
+              x_neuron_.at(l)-=F_x;
+              y_neuron_.at(l)-=F_y;
+              relax=true;
+            }
+          }
+        }
+      }
+      
+      TGraph2D *map=new TGraph2D("map", "map");
+      for (unsigned int i=0; i<neurons.size(); ++i)
+      {
+        map->Fill(x_neuron_.at(i), y_neuron_at(i));
+      }
+      c->cd();
+      map->Draw();
+      
     }
       
     

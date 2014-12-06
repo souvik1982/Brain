@@ -14,7 +14,6 @@ ALL RIGHTS RESERVED
 
 #include "TMath.h"
 
-#include "../interface/Entity.h"
 #include "../interface/Fire.h"
 
 Fire::Fire(double x, double y, double theta, double worldSize, int debug): Entity(worldSize)

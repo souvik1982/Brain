@@ -19,6 +19,7 @@ ALL RIGHTS RESERVED
 #include <iostream>
 #include <math.h>
 #include <string.h>
+#include <TFile.h>
 
 #include <TCanvas.h>
 #include <TEllipse.h>
@@ -193,6 +194,8 @@ class Brain
             n->index=j;
             n->synapticStrength=r3->Rndm(); // Should be read from file
             n->distance=r3->Rndm(); // Should be read from file
+            // n->synapticStrength=0.5;
+            // n->distance=0.5; // Should be read from file
             neurons.at(i)->push_back_relation(n);
             
             h_synapticStrengths_->Fill(i, j, n->synapticStrength);
@@ -402,7 +405,7 @@ class Bot: public Entity
       double rnd=r3->Rndm();
       int diffBrainSize=0;
       if (rnd<0.25) diffBrainSize=-1;
-      else if (rnd>0.75) diffBrainSize=1;
+      else if (rnd>0.75) diffBrainSize=1; // && brain->neurons.size()<55
       int newBrainSize=brain->neurons.size()+diffBrainSize;
       brain_=new Brain(newBrainSize);
       if (diffBrainSize==0)
@@ -598,6 +601,7 @@ void BrainInWorld_LEAN()
     Bot *bot=new Bot(r3->Rndm()*worldSize, r3->Rndm()*worldSize, r3->Rndm()*2.*pi, 30);
     bots.push_back(bot);
   }
+  std::cout<<"Made bots"<<std::endl;
   
   typedef std::vector<Fire*> Fires;
   Fires fires;
@@ -616,9 +620,10 @@ void BrainInWorld_LEAN()
     Food *food=new Food(r3->Rndm()*worldSize, r3->Rndm()*worldSize, r3->Rndm()*2.*pi);
     foods.push_back(food);
   }
+  std::cout<<"Made food"<<std::endl;
   
-  // std::vector <double> avgBrainSize_vector;
-  // std::vector <double> time_vector;
+  std::vector <double> avgBrainSize_vector;
+  std::vector <double> time_vector;
   
   gStyle->SetPalette(1);
   
@@ -637,24 +642,16 @@ void BrainInWorld_LEAN()
     c_Distance_Histograms->Divide(ceil(bots.size()/3.), 3);
   }
   int time=0;
-  while (foods.size()>0 && bots.size()>0)
+  int generations=0;
+  while (foods.size()>0 && bots.size()>0 && generations<50000)
   {
     ++time;
-    // std::cout<<"=== Time ==="<<time<<std::endl;
-    // std::cout<<" Number of bots = "<<bots.size()<<std::endl;
     double avgBrainSize=0;
     for (unsigned int i=0; i<bots.size(); ++i)
     {
-      // bots.at(i)->moveForward();
-      // if (r3->Rndm()>0.5) bots.at(i)->turnLeft(); else bots.at(i)->turnRight();
       bots.at(i)->see(&foods); //, &fires);
       bots.at(i)->stepInTime();
-      // std::cout<<" = Bot "<<i<<" =="<<std::endl;
-      // bots.at(i)->printBrain();
-      // avgBrainSize=avgBrainSize+bots.at(i)->brain_->neurons.size();
     }
-    // avgBrainSize_vector.push_back(avgBrainSize/bots.size());
-    // time_vector.push_back(time);
     for (unsigned int i=0; i<fires.size(); ++i)
     {
       fires.at(i)->moveForward();
@@ -692,6 +689,9 @@ void BrainInWorld_LEAN()
         }
         Bot *bot=new Bot(bots.at(i)->x_, bots.at(i)->y_, bots.at(i)->theta_, bots.at(i)->brain_);
         bots.push_back(bot);
+        ++generations;
+        avgBrainSize_vector.push_back(bot->brain_->neurons.size());
+        time_vector.push_back(time);
         if (verb) std::cout<<"removed from vector, foods.size() = "<<foods.size()<<std::endl;
       }
     }
@@ -725,6 +725,7 @@ void BrainInWorld_LEAN()
     
     if (time%timeStep==0)
     {
+      // std::cout<<"Time = "<<time<<", amount of food left = "<<foods.size()<<std::endl;
       c_World->cd();
       for (unsigned int i=0; i<bots.size(); ++i) bots.at(i)->draw();
       for (unsigned int i=0; i<fires.size(); ++i) fires.at(i)->draw();
@@ -755,12 +756,16 @@ void BrainInWorld_LEAN()
       // c_Distance_Histograms->SaveAs("c_Distance_Histograms.png");
     }
   }
-  /*
+  
   TGraph *g_avgBrainSize=new TGraph(avgBrainSize_vector.size(), &time_vector[0], &avgBrainSize_vector[0]);
   g_avgBrainSize->SetTitle("Average size of brains against time; time steps; Average size of brains");
   TCanvas *c_avgBrainSize=new TCanvas("avgBrainSize", "Average Brain Size", 700, 700);
   g_avgBrainSize->Draw("AL*");
   c_avgBrainSize->SaveAs("c_avgBrainSize.png");
-  */
+  
+  TFile *file=new TFile("AnalyzeThis.root", "recreate");
+  g_avgBrainSize->Write();
+  file->Close();
+  
 }
     

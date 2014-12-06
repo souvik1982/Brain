@@ -12,6 +12,8 @@ ALL RIGHTS RESERVED
 =================================================
 */
 
+#pragma once
+
 #include "TEllipse.h"
 
 class Entity
@@ -25,7 +27,6 @@ class Entity
   public:
   
     Entity(double worldSize);
-    ~Entity();
     void turnLeft();
     void turnRight();
     void circularBoundaries();

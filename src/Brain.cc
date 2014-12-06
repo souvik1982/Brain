@@ -14,21 +14,17 @@ ALL RIGHTS RESERVED
 
 #include <iostream>
 
-#include "TRandom3.h"
-
-#include "../interface/Neuron.h"
 #include "../interface/Brain.h"
 #include "../interface/ToolBox.h"
 
-TRandom3 *r3=new TRandom3();
-
-Brain::Brain(int size, int debug, float timeStep)
+Brain::Brain(int size, int debug, std::string name)
 {
-  if (debug == 1)
+  debug_=debug;
+  if (debug_ == 1)
   {
-    h_potentials_=new TH1F(("h_potentials_"+ftoa(timeStep)).c_str(), "Neural Action Potentials", size, 0, size);
-    h_synapticStrengths_=new TH2F(("h_synapticStrengths_"+ftoa(timeStep)).c_str(), "Neural Synaptic Strengths", size, size, 0, size, 0, size);
-    h_distances_=new TH2F(("h_distances_"+ftoa(timeStep)).c_str(), "Neural Distances", size, size, 0, size, 0, size);
+    h_potentials_=new TH1F(("h_potentials_"+name).c_str(), "Neural Action Potentials", size, 0, size);
+    h_synapticStrengths_=new TH2F(("h_synapticStrengths_"+name).c_str(), "Neural Synaptic Strengths", size, size, 0, size, 0, size);
+    h_distances_=new TH2F(("h_distances_"+name).c_str(), "Neural Distances", size, size, 0, size, 0, size);
   }
   for (int i=0; i<size; ++i)
   {
@@ -48,13 +44,13 @@ Brain::Brain(int size, int debug, float timeStep)
         n->synapticStrength = r3->Rndm();
         neuron->push_back_relation(n);
         
-        if (debug == 1)
+        if (debug_ == 1)
         {
           h_synapticStrengths_->Fill(i, j, n->synapticStrength);
           h_distances_->Fill(i, j, n->distance);
         }
       }
-      if (debug == 1)
+      if (debug_ == 1)
       {
         h_potentials_->Fill(i+1);
       }
@@ -66,18 +62,100 @@ Brain::Brain(int size, int debug, float timeStep)
   }
 }
 
+Brain::Brain(Brain *parentBrain, int diffBrainSize, int debug, std::string name)
+{
+  int brainSize=parentBrain->neurons_.size();
+  Brain(brainSize, debug, name);
+  
+  if (diffBrainSize<=0)
+  {
+    for (unsigned int i=0; i<neurons_.size(); ++i)
+    {
+      Neuron *neuron=neurons_.at(i);
+      Neuron *parentNeuron=parentBrain->neurons_.at(i);
+      neuron->neuralRelations_.clear();
+      NeuralRelations parentNeuralRelations=parentNeuron->neuralRelations_;
+      for (unsigned int j=0; j<parentNeuralRelations.size(); ++j)
+      {
+        if (parentNeuralRelations.at(j)->index < neurons_.size())
+        {
+          NeuralRelation *neuralRelation=new NeuralRelation;
+          neuralRelation->index=parentNeuralRelations.at(j)->index;
+          neuralRelation->synapticStrength=r3->Rndm();
+          double newDistance=(parentNeuralRelations.at(j)->distance)-0.05+0.1*r3->Rndm();
+          if (newDistance>0)
+          {
+            if (newDistance>1) newDistance=1;
+            neuralRelation->distance=newDistance;
+            neuron->push_back_relation(neuralRelation);
+          }
+        }
+      }
+    }
+  } 
+  else if (diffBrainSize>0)
+  {
+    for (unsigned int i=0; i<neurons_.size()-1; ++i)
+    {
+      Neuron *neuron=neurons_.at(i);
+      Neuron *parentNeuron=parentBrain->neurons_.at(i);
+      neuron->neuralRelations_.clear();
+      NeuralRelations parentNeuralRelations=parentNeuron->neuralRelations_;
+      for (unsigned int j=0; j<parentNeuralRelations.size(); ++j)
+      {
+        NeuralRelation *neuralRelation=new NeuralRelation;
+        neuralRelation->index=parentNeuralRelations.at(j)->index;
+        neuralRelation->synapticStrength=r3->Rndm();
+        double newDistance=(parentNeuralRelations.at(j)->distance)-0.05+0.1*r3->Rndm();
+        if (newDistance>0)
+        {
+          if (newDistance>1) newDistance=1;
+          neuralRelation->distance=newDistance;
+          neuron->push_back_relation(neuralRelation);
+        }
+      }
+      // Add a new neural relation with 50% chance of connecting to new neuron
+      if (r3->Rndm()>0.5)
+      {
+        NeuralRelation *neuralRelation=new NeuralRelation;
+        neuralRelation->index=neurons_.size()-1;
+        neuralRelation->synapticStrength=r3->Rndm();
+        neuralRelation->distance=r3->Rndm();
+        neuron->push_back_relation(neuralRelation);
+      } 
+    }
+  }
+    
+  if (debug == 2)
+  {
+    for (unsigned int i=0; i<neurons_.size(); ++i)
+    {
+      Neuron *neuron=neurons_.at(i);
+      NeuralRelations *neuralRelations=&(neuron->neuralRelations_);
+      for (unsigned int j=0; j<neuralRelations->size(); ++j)
+      {
+        NeuralRelation *neuralRelation=neuralRelations->at(j);
+        h_distances_->SetBinContent(i, neuralRelation->index, neuralRelation->distance);
+      }
+    }
+  }
+}   
+
 Brain::~Brain()
 {
   for (unsigned int i=0; i<neurons_.size(); ++i)
   {
     delete neurons_.at(i);
   }
-  delete h_potentials_;
-  delete h_synapticStrengths_;
-  delete h_distances_;
+  if (debug_==1)
+  {
+    delete h_potentials_;
+    delete h_synapticStrengths_;
+    delete h_distances_;
+  }
 }
 
-void Brain::stepInTime(int debug)
+void Brain::stepInTime()
 {
   for (unsigned int i=0; i<neurons_.size(); ++i)
   {
@@ -86,7 +164,7 @@ void Brain::stepInTime(int debug)
   for (unsigned int i=0; i<neurons_.size(); ++i)
   {
     neurons_.at(i)->stepInTime2();
-    if (debug == 1)
+    if (debug_ == 1)
     {
       h_potentials_->SetBinContent(i+1, neurons_.at(i)->potential_);
       NeuralRelations *neuralRelations=&(neurons_.at(i)->neuralRelations_);

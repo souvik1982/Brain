@@ -14,7 +14,6 @@ ALL RIGHTS RESERVED
 
 #include "TMath.h"
 
-#include "../interface/Entity.h"
 #include "../interface/Food.h"
 
 Food::Food(double x, double y, double theta, double worldSize, int debug): Entity(worldSize)
@@ -25,6 +24,11 @@ Food::Food(double x, double y, double theta, double worldSize, int debug): Entit
   circle_=new TEllipse(x, y, 3., 3.);
   circle_->SetLineColor(kGreen+2);
   circle_->SetFillColor(kGreen);
+}
+
+Food::~Food()
+{
+  circle_->Delete();
 }
 
 void Food::draw()

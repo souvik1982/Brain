@@ -20,11 +20,6 @@ Entity::Entity(double worldSize)
   worldSize_=worldSize;
 }
 
-Entity::~Entity()
-{
-  delete circle_;
-}
-
 void Entity::turnLeft()
 {
   theta_=checkAngle(theta_+0.1);
