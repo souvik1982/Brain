@@ -5,6 +5,11 @@
 
 static const double pi=3.14159265358979;
 
+inline int decodeDebug(int d, int i) 
+{
+  return (d>>i)&0x1;
+}
+
 inline double convertToZeroToPi(double angle)
 {
   if (angle<0) return 2.*pi+angle;

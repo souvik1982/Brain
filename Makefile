@@ -1,8 +1,6 @@
 ROOTFLAGS = $(shell root-config --cflags)
 ROOTLIBS  = $(shell root-config --libs)
 
-#all: BrainInWorld Neuron.o Brain.o Entity.o Fire.o Food.o BrainInWorld.o
-
 all: BrainInWorld
 
 clean:
@@ -35,7 +33,7 @@ Bot.o: src/Bot.cc
 	c++ -c src/Bot.cc -c $(ROOTFLAGS)
 	mv Bot.o lib/
 
-BrainInWorld.o: BrainInWorld_factorized.cc
-	c++ -c BrainInWorld_factorized.cc -c $(ROOTFLAGS)
-	mv BrainInWorld_factorized.o lib/BrainInWorld.o
+BrainInWorld.o: BrainInWorld.cc
+	c++ -c BrainInWorld.cc -c $(ROOTFLAGS)
+	mv BrainInWorld.o lib/BrainInWorld.o
 

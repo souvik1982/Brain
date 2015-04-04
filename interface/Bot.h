@@ -12,6 +12,8 @@ ALL RIGHTS RESERVED
 =================================================
 */
 
+#pragma once
+
 #include "Brain.h"
 #include "Food.h"
 

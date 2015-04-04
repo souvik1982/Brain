@@ -15,6 +15,8 @@ ALL RIGHTS RESERVED
 #include "../interface/Bot.h"
 #include "../interface/ToolBox.h"
 
+#include <iostream>
+
 Bot::Bot(double x, double y, double theta, int brainSize, std::string name, double worldSize, int debug): Entity(worldSize)
 {
   debug_=debug;
@@ -24,8 +26,8 @@ Bot::Bot(double x, double y, double theta, int brainSize, std::string name, doub
   x_=x;
   y_=y;
   theta_=theta;
-  brain_=new Brain(brainSize);
-  if (debug_ & 0x01)
+  brain_=new Brain(brainSize, debug_, name_);
+  if (decodeDebug(debug_, 0)==1)
   {
     circle_=new TEllipse(x, y, 2., 2., theta*180./pi+22.5, 360.+theta*180./pi-22.5);
     circle_->SetLineColor(kBlack);
@@ -40,11 +42,14 @@ Bot::Bot(double x, double y, double theta, int brainSize, std::string name, doub
 Bot::Bot(double x, double y, double theta, Bot *parentBot): Entity(parentBot->worldSize_)
 {
   ++(parentBot->kids_);
-  name_=parentBot->name_+itoa(parentBot->kids_);
+  debug_=parentBot->debug_;
+  worldSize_=parentBot->worldSize_;
+  name_=parentBot->name_+"_"+itoa(parentBot->kids_);
+  kids_=0;
   x_=x;
   y_=y;
   theta_=theta;
-  if (debug_ & 0x01)
+  if (decodeDebug(debug_, 0)==1)
   {
     circle_=new TEllipse(x, y, 2., 2., theta*180./pi+22.5, 360.+theta*180./pi-22.5);
     circle_->SetLineColor(kBlack);
@@ -64,7 +69,7 @@ Bot::Bot(double x, double y, double theta, Bot *parentBot): Entity(parentBot->wo
 
 Bot::~Bot()
 {
-  if (debug_ & 0x01)
+  if (decodeDebug(debug_, 0)==1)
   {
     circle_->Delete();
     line1_->Delete();
@@ -75,7 +80,7 @@ Bot::~Bot()
 
 void Bot::draw()
 {
-  if (debug_ & 0x01)
+  if (decodeDebug(debug_, 0)==1)
   {
     circle_->SetX1(x_);
     circle_->SetY1(y_);
@@ -119,7 +124,7 @@ void Bot::seeFood(std::vector<Food*> *foods) //,std::vector<Fire*> *fires) //, d
       double dist=pow(pow(x_-foods->at(i)->x_, 2)+pow(y_-foods->at(i)->y_, 2), 0.5);
       brain_->neurons_.at(0)->receive(1);
       if (dist<30.) brain_->neurons_.at(1)->receive(1);
-      else if (dist>30 && dist<60.) brain_->neurons_.at(2)->receive(1);
+      else if (dist<60.) brain_->neurons_.at(2)->receive(1);
       else brain_->neurons_.at(3)->receive(1);
     }
   }

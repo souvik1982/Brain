@@ -12,6 +12,8 @@ ALL RIGHTS RESERVED
 =================================================
 */
 
+#pragma once
+
 #include "Entity.h"
 
 class Food: public Entity

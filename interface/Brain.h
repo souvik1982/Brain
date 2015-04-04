@@ -12,6 +12,8 @@ ALL RIGHTS RESERVED
 =================================================
 */
 
+#pragma once
+
 #include "Neuron.h"
 
 #include "TH1F.h"
