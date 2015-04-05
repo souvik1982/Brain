@@ -39,7 +39,7 @@ Bot::Bot(double x, double y, double theta, int brainSize, std::string name, doub
   }
 }
 
-Bot::Bot(double x, double y, double theta, Bot *parentBot): Entity(parentBot->worldSize_)
+Bot::Bot(double x, double y, double theta, Bot *parentBot, double mu_newNeuron, double mu_newConnection, double mu_modConnection): Entity(parentBot->worldSize_)
 {
   ++(parentBot->kids_);
   debug_=parentBot->debug_;
@@ -62,9 +62,9 @@ Bot::Bot(double x, double y, double theta, Bot *parentBot): Entity(parentBot->wo
   
   double rnd=r3->Rndm();
   int diffBrainSize=0;
-  if (rnd<0.25) diffBrainSize=-1;
-  else if (rnd>0.75) diffBrainSize=1;
-  brain_=new Brain(parentBot->brain_, diffBrainSize, debug_, name_);
+  if (rnd<mu_newNeuron/2.) diffBrainSize=-1;
+  else if (rnd>1.-mu_newNeuron/2.) diffBrainSize=1;
+  brain_=new Brain(parentBot->brain_, diffBrainSize, debug_, name_, mu_newConnection, mu_modConnection);
 }
 
 Bot::~Bot()
@@ -103,8 +103,8 @@ void Bot::draw()
 
 void Bot::moveForward()
 {
-  x_=x_+0.2*cos(theta_);
-  y_=y_+0.2*sin(theta_);
+  x_=x_+1.*cos(theta_);
+  y_=y_+1.*sin(theta_);
   bouncyBoundaries();
 }
 

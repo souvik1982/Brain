@@ -40,7 +40,7 @@ void Food::draw()
 
 void Food::moveForward()
 {
-  x_=x_+0.001*cos(theta_);
-  y_=y_+0.001*sin(theta_);
+  x_=x_+0.01*cos(theta_);
+  y_=y_+0.01*sin(theta_);
   bouncyBoundaries();
 }

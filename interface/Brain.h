@@ -34,7 +34,7 @@ class Brain
   public:
   
     Brain(int size, int debug = 0, std::string name = "0");
-    Brain(Brain *brain, int diffBrainSize, int debug = 0, std::string name = "0");
+    Brain(Brain *brain, int diffBrainSize, int debug = 0, std::string name = "0", double mu_newConnection=0.0, double mu_modConnection=0.0);
     ~Brain();
     void stepInTime();
     
