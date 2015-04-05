@@ -38,6 +38,7 @@ class Bot: public Entity
     
     void draw();
     void moveForward();
+    void moveBackward();
     bool inSight(double x, double y);
     void seeFood(std::vector<Food*> *foods);
     void stepInTime();
