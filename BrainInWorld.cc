@@ -39,12 +39,12 @@ ALL RIGHTS RESERVED
 #include "interface/Food.h"
 #include "interface/ToolBox.h"
 
-int timeStep=20;
+int timeStep=50;
 double worldSize=100;
 double regenFood=1.0;
 
 unsigned int nBots=10;
-unsigned int nFoods=50;
+unsigned int nFoods=5;
   
 // Mutation parameters
 double mu_newNeuron=0.2;
@@ -120,7 +120,7 @@ int main()
   int dtime=0;
     
   // Time loop
-  while (foods.size()>0 && generations<50000)
+  while (foods.size()>0 && generations<5e4)
   {
     
     ++time;
