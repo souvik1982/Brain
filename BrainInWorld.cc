@@ -39,9 +39,18 @@ ALL RIGHTS RESERVED
 #include "interface/Food.h"
 #include "interface/ToolBox.h"
 
-int timeStep=1000;
+int timeStep=20;
 double worldSize=100;
-double regenFood=0.90;
+double regenFood=1.0;
+
+unsigned int nBots=10;
+unsigned int nFoods=50;
+  
+// Mutation parameters
+double mu_newNeuron=0.2;
+double mu_newConnection=0.01;
+double mu_modConnection=0.01;
+
 
 // Debug Levels
 // bits: xxxx
@@ -49,11 +58,11 @@ double regenFood=0.90;
 // bit 1 = Verbalization
 // bit 2 = Fill histograms
 // bit 3 = Draw the histograms
-int debug = 0x1;
+int debug = 0x0;
 
 int main()
 { 
-  r3->SetSeed(120);
+  r3->SetSeed(100);
   
   std::cout<<"debug = "<<debug<<std::endl;
   std::cout<<"visualization = "<<decodeDebug(debug, 0)<<std::endl;
@@ -62,7 +71,6 @@ int main()
   
   typedef std::vector<Bot*> Bots;
   Bots bots;
-  unsigned int nBots=10;
   for (unsigned int i=0; i<nBots; ++i)
   {
     Bot *bot=new Bot(r3->Rndm()*worldSize, r3->Rndm()*worldSize, r3->Rndm()*2.*pi, 30, "Bot_"+itoa(i), worldSize, debug);
@@ -70,18 +78,8 @@ int main()
   }
   std::cout<<"Made bots"<<std::endl;
   
-  typedef std::vector<Fire*> Fires;
-  Fires fires;
-  unsigned int nFires=0;
-  for (unsigned int i=0; i<nFires; ++i)
-  {
-    Fire *fire=new Fire(r3->Rndm()*worldSize, r3->Rndm()*worldSize, r3->Rndm()*2.*pi, worldSize);
-    fires.push_back(fire);
-  }
-  
   typedef std::vector<Food*> Foods;
   Foods foods;
-  unsigned int nFoods=100;
   for (unsigned int i=0; i<nFoods; ++i)
   {
     Food *food=new Food(r3->Rndm()*worldSize, r3->Rndm()*worldSize, r3->Rndm()*2.*pi, worldSize);
@@ -89,9 +87,10 @@ int main()
   }
   std::cout<<"Made food"<<std::endl;
   
-  /*std::vector <double> time_vector;
+  std::vector <double> time_vector;
   std::vector <double> avgBrainSize_vector;
-  std::vector <double> generation_vector;*/
+  std::vector <double> generation_vector;
+  std::vector <double> dtime_vector;
   
   gStyle->SetPalette(1);
   
@@ -117,22 +116,20 @@ int main()
     
   int time=0;
   int generations=0;
+  int oldGeneration=generations;
+  int dtime=0;
     
   // Time loop
-  while (foods.size()>0 && bots.size()>0 && generations<50000)
+  while (foods.size()>0 && generations<50000)
   {
     
     ++time;
-    // double avgBrainSize=0;
+    ++dtime;
     
     for (unsigned int i=0; i<bots.size(); ++i)
     {
       bots.at(i)->seeFood(&foods);
       bots.at(i)->stepInTime();
-    }
-    for (unsigned int i=0; i<fires.size(); ++i)
-    {
-      fires.at(i)->moveForward();
     }
     for (unsigned int i=0; i<foods.size(); ++i)
     {
@@ -165,16 +162,20 @@ int main()
         
         if (r3->Rndm()<regenFood)
         {
-          Food *food=new Food(r3->Rndm()*worldSize, r3->Rndm()*worldSize, r3->Rndm()*pi, worldSize);
+          Food *food=new Food(r3->Rndm()*worldSize, r3->Rndm()*worldSize, r3->Rndm()*(2.*pi), worldSize);
           foods.push_back(food);
         }
         
-        Bot *bot=new Bot(bots.at(i)->x_, bots.at(i)->y_, bots.at(i)->theta_, bots.at(i));
+        Bot *bot=new Bot(bots.at(i)->x_, bots.at(i)->y_, bots.at(i)->theta_, bots.at(i), mu_newNeuron, mu_newConnection, mu_modConnection);
         bots.push_back(bot);
         ++generations;
         
-        // avgBrainSize_vector.push_back(bot->brain_->neurons_.size());
-        // time_vector.push_back(time);
+        avgBrainSize_vector.push_back(bot->brain_->neurons_.size());
+        time_vector.push_back(time);
+        generation_vector.push_back(generations);
+        dtime_vector.push_back(dtime);
+        dtime=0;
+        
         if (decodeDebug(debug, 1)==1) std::cout<<"removed from vector, foods.size() = "<<foods.size()<<std::endl;
       }
     }
@@ -189,7 +190,6 @@ int main()
     {
       c_World->cd();
       for (unsigned int i=0; i<bots.size(); ++i) bots.at(i)->draw();
-      for (unsigned int i=0; i<fires.size(); ++i) fires.at(i)->draw();
       for (unsigned int i=0; i<foods.size(); ++i) foods.at(i)->draw();
       c_World->Update();
     }
@@ -200,33 +200,47 @@ int main()
       {
         c_Potential_Histograms->cd(i+1);
         bots.at(i)->brain_->drawPotentials();
-        /*c_Distance_Histograms->cd(i+1);
+        c_Distance_Histograms->cd(i+1);
         bots.at(i)->brain_->drawDistances();
         c_SynapticStrength_Histograms->cd(i+1);
-        bots.at(i)->brain_->drawSynapticStrengths();*/
+        bots.at(i)->brain_->drawSynapticStrengths();
       }
       c_Potential_Histograms->Modified();
       c_Potential_Histograms->Update();
-      /*c_SynapticStrength_Histograms->Modified();
+      c_SynapticStrength_Histograms->Modified();
       c_SynapticStrength_Histograms->Update();
       c_Distance_Histograms->Modified();
-      c_Distance_Histograms->Update();*/
+      c_Distance_Histograms->Update();
       
       // c_Potential_Histograms->SaveAs("c_Potential_Histograms.png");
       // c_SynapticStrength_Histograms->SaveAs("c_SynapticStrength_Histograms.png");
       // c_Distance_Histograms->SaveAs("c_Distance_Histograms.png");
     }
+    
+    if (generations%100==0 && generations!=oldGeneration) 
+    {
+      std::cout<<"Generation "<<generations<<std::endl;
+      oldGeneration=generations;
+      
+      TGraph *g_avgBrainSize_time=new TGraph(avgBrainSize_vector.size(), &time_vector[0], &avgBrainSize_vector[0]);
+      g_avgBrainSize_time->SetName("g_avgBrainSize_time");
+      g_avgBrainSize_time->SetTitle("; time steps; Average size of brains");
+
+      TGraph *g_avgBrainSize_generation=new TGraph(avgBrainSize_vector.size(), &generation_vector[0], &avgBrainSize_vector[0]);
+      g_avgBrainSize_generation->SetName("g_avgBrainSize_generation");
+      g_avgBrainSize_generation->SetTitle("; generations; Average size of brains");
+      
+      TGraph *g_dtime_generation=new TGraph(dtime_vector.size(), &generation_vector[0], &dtime_vector[0]);
+      g_dtime_generation->SetName("g_dtime_generation");
+      g_dtime_generation->SetTitle("; generations; Time to next meal");
+      
+      TFile *file=new TFile("AnalyzeThis.root", "recreate");
+      g_avgBrainSize_time->Write();
+      g_avgBrainSize_generation->Write();
+      g_dtime_generation->Write();
+      file->Close();
+    }
   }
-  
-  /*TGraph *g_avgBrainSize=new TGraph(avgBrainSize_vector.size(), &time_vector[0], &avgBrainSize_vector[0]);
-  g_avgBrainSize->SetTitle("Average size of brains against time; time steps; Average size of brains");
-  TCanvas *c_avgBrainSize=new TCanvas("avgBrainSize", "Average Brain Size", 700, 700);
-  g_avgBrainSize->Draw("AL*");
-  c_avgBrainSize->SaveAs("c_avgBrainSize.png");
-  
-  TFile *file=new TFile("AnalyzeThis.root", "recreate");
-  g_avgBrainSize->Write();
-  file->Close();*/
   
   return 0;
 }

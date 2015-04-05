@@ -33,7 +33,7 @@ class Bot: public Entity
   public:
   
     Bot(double x, double y, double theta, int brainSize, std::string name, double worldSize, int debug = 1);
-    Bot(double x, double y, double theta, Bot *parentBot);
+    Bot(double x, double y, double theta, Bot *parentBot, double mu_newNeuron, double mu_newConnection, double mu_modConnection);
     ~Bot();
     
     void draw();
