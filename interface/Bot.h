@@ -26,14 +26,16 @@ class Bot: public Entity
     Brain *brain_;
     std::string name_;
     TLine *line1_, *line2_;
+    int bodyColor_;
+    double speed_;
     double worldSize_;
     int debug_;
     int kids_;
     
   public:
   
-    Bot(double x, double y, double theta, int brainSize, std::string name, double worldSize, int debug = 1);
-    Bot(double x, double y, double theta, Bot *parentBot, double mu_newNeuron, double mu_newConnection, double mu_modConnection);
+    Bot(double x, double y, double theta, int brainSize, int bodyColor, double speed, std::string name, double worldSize, int debug = 1);
+    Bot(Bot *parentBot, double mu_newNeuron, double mu_newConnection, double mu_modConnection);
     ~Bot();
     
     void draw();
@@ -41,6 +43,7 @@ class Bot: public Entity
     void moveBackward();
     bool inSight(double x, double y);
     void seeFood(std::vector<Food*> *foods);
+    void seeBots(std::vector<Bot*> *bots);
     void stepInTime();
     
     void printBrain();

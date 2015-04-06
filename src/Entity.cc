@@ -43,7 +43,7 @@ void Entity::circularBoundaries()
 void Entity::bouncyBoundaries()
 {
   if (x_<0) {x_=2; theta_=pi-theta_;}
-  if (x_>worldSize_) {x_=98; theta_=pi-theta_;}
+  if (x_>worldSize_) {x_=worldSize_-2; theta_=pi-theta_;}
   if (y_<0) {y_=2; theta_=-theta_;}
-  if (y_>worldSize_) {y_=98; theta_=-theta_;}
+  if (y_>worldSize_) {y_=worldSize_-2; theta_=-theta_;}
 }
