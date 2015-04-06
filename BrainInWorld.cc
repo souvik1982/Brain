@@ -38,8 +38,9 @@ ALL RIGHTS RESERVED
 #include "interface/Fire.h"
 #include "interface/Food.h"
 #include "interface/ToolBox.h"
+#include "interface/CommandLineArguments.h"
 
-int timeStep=50;
+int timeStep=200;
 double worldSize=100;
 double regenFood=1.0;
 
@@ -51,17 +52,24 @@ double mu_newNeuron=0.2;
 double mu_newConnection=0.01;
 double mu_modConnection=0.01;
 
-
 // Debug Levels
 // bits: xxxx
 // bit 0 = TCanvas visualization
 // bit 1 = Verbalization
 // bit 2 = Fill histograms
 // bit 3 = Draw the histograms
-int debug = 0x0;
+int debug = 0x1;
 
-int main()
+int main(int argc, char *argv[])
 { 
+  // Get command line arguments
+  std::map<std::string, int> cmdMap=commandLineArguments(argc, argv);
+  if (cmdMap.find("-debug")!=cmdMap.end())     debug=cmdMap["-debug"];
+  if (cmdMap.find("-timeStep")!=cmdMap.end())  timeStep=cmdMap["-timeStep"];
+  if (cmdMap.find("-worldSize")!=cmdMap.end()) worldSize=cmdMap["-worldSize"];
+  if (cmdMap.find("-nBots")!=cmdMap.end())     nBots=cmdMap["-nBots"];
+  if (cmdMap.find("-nFoods")!=cmdMap.end())    nFoods=cmdMap["-nFoods"];
+
   r3->SetSeed(100);
   
   std::cout<<"debug = "<<debug<<std::endl;

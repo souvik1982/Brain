@@ -108,6 +108,13 @@ void Bot::moveForward()
   bouncyBoundaries();
 }
 
+void Bot::moveBackward()
+{
+  x_=x_-1.*cos(theta_);
+  y_=y_-1.*sin(theta_);
+  bouncyBoundaries();
+}
+
 bool Bot::inSight(double x, double y)
 {
   double thetac=convertToZeroToPi(atan2((y-y_), (x-x_)));
@@ -136,6 +143,7 @@ void Bot::stepInTime()
   if (brain_->neurons_.at(5)->potential()>0.8) moveForward();
   if (brain_->neurons_.at(6)->potential()>0.8) turnLeft();
   if (brain_->neurons_.at(7)->potential()>0.8) turnRight();
+  if (brain_->neurons_.at(8)->potential()>0.8) moveBackward();
 }
 
 void Bot::printBrain()
