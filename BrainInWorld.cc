@@ -144,7 +144,7 @@ int main(int argc, char *argv[])
   int dtime_predator=0;
     
   // Time loop
-  while (foods.size()>0 && generations<5e4)
+  while (foods.size()>0 && generations<5e4 && generations_predator<5e4)
   {
     
     ++time;
