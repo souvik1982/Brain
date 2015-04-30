@@ -36,8 +36,8 @@ Bot::Bot(double x, double y, double theta, int brainSize, int bodyColor, double 
     circle_->SetFillColor(bodyColor_);
     line1_=new TLine(x_, y_, x_+20.*cos(theta_+pi/16.), y_+20.*sin(theta_+pi/16.));
     line2_=new TLine(x_, y_, x_+20.*cos(theta_-pi/16.), y_+20.*sin(theta_-pi/16.));
-    line1_->SetLineColor(kCyan);
-    line2_->SetLineColor(kCyan);
+    line1_->SetLineColor(bodyColor_);
+    line2_->SetLineColor(bodyColor_);
   }
 }
 
@@ -60,8 +60,8 @@ Bot::Bot(Bot *parentBot, double mu_newNeuron, double mu_newConnection, double mu
     circle_->SetFillColor(bodyColor_);
     line1_=new TLine(x_, y_, x_+20.*cos(theta_+pi/16.), y_+20.*sin(theta_+pi/16.));
     line2_=new TLine(x_, y_, x_+20.*cos(theta_-pi/16.), y_+20.*sin(theta_-pi/16.));
-    line1_->SetLineColor(kCyan);
-    line2_->SetLineColor(kCyan);
+    line1_->SetLineColor(bodyColor_);
+    line2_->SetLineColor(bodyColor_);
   }
   
   double rnd=r3->Rndm();

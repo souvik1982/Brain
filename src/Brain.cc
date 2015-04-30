@@ -38,12 +38,12 @@ Brain::Brain(int size, int debug, std::string name)
       // It it connected to 50% of the other neurons.
       // Each synaptic strength and distance parameter 
       // is flat a random number from 0 to 1.
-      if (i!=j && r3->Rndm()>0.5)
+      if (i!=j && r3->Uniform()>0.5)
       {
         NeuralRelation *n = new NeuralRelation;
         n->index = j;
-        n->synapticStrength = r3->Rndm();
-        n->distance=r3->Rndm();
+        n->synapticStrength = r3->Uniform();
+        n->distance=r3->Uniform();
         neuron->push_back_relation(n);
         
         if (decodeDebug(debug_, 2)==1)
@@ -83,18 +83,23 @@ Brain::Brain(Brain *parentBrain, int diffBrainSize, int debug, std::string name,
       NeuralRelations parentNeuralRelations=parentNeuron->neuralRelations_;
       for (unsigned int j=0; j<parentNeuralRelations.size(); ++j)
       {
-        double rnd=r3->Rndm();
+        double rnd=r3->Uniform();
         if (rnd<mu_newConnection/2.) {} // Kill a connection
-        else if (rnd>1.-mu_newConnection/2.) // Make a new connection
+        else if (rnd>(1.-mu_newConnection/2.)) // Make a new connection
         {
           NeuralRelation *neuralRelation=new NeuralRelation;
           do
           {
-            neuralRelation->index=int(brainSize*r3->Rndm());
+            neuralRelation->index=int(brainSize*r3->Uniform());
           } while (neuralRelation->index==i);
-          neuralRelation->synapticStrength=r3->Rndm();
-          neuralRelation->distance=r3->Rndm();
-          neuron->push_back_relation(neuralRelation);
+          neuralRelation->synapticStrength=r3->Uniform();
+          double newDistance=r3->Uniform();
+          // if (newDistance>0.1)
+          {
+            neuralRelation->distance=newDistance;
+            neuron->push_back_relation(neuralRelation);
+          }
+          --j;
         }
         else // Modify the existing connection
         {
@@ -102,12 +107,15 @@ Brain::Brain(Brain *parentBrain, int diffBrainSize, int debug, std::string name,
           {
             NeuralRelation *neuralRelation=new NeuralRelation;
             neuralRelation->index=parentNeuralRelations.at(j)->index;
-            neuralRelation->synapticStrength=r3->Rndm();
-            double newDistance=(parentNeuralRelations.at(j)->distance)+mu_modConnection*(-0.5+r3->Rndm());
+            neuralRelation->synapticStrength=r3->Uniform();
+            double newDistance=(parentNeuralRelations.at(j)->distance)+mu_modConnection*(-0.5+r3->Uniform());
             if (newDistance<0) newDistance=0;
             if (newDistance>1) newDistance=1;
-            neuralRelation->distance=newDistance;
-            neuron->push_back_relation(neuralRelation);
+            // if (newDistance>0.1)
+            {
+              neuralRelation->distance=newDistance;
+              neuron->push_back_relation(neuralRelation);
+            }
           }
         }
       }
@@ -122,43 +130,57 @@ Brain::Brain(Brain *parentBrain, int diffBrainSize, int debug, std::string name,
       Neuron *neuron=new Neuron();
       Neuron *parentNeuron=parentBrain->neurons_.at(i);
       NeuralRelations parentNeuralRelations=parentNeuron->neuralRelations_;
+      bool connectedToNewNeuron=false;
       for (unsigned int j=0; j<parentNeuralRelations.size(); ++j)
       {
-        double rnd=r3->Rndm();
+        double rnd=r3->Uniform();
         if (rnd<mu_newConnection/2.) {} // Kill a connection
         else if (rnd>1.-mu_newConnection/2.) // Make a new connection
         {
           NeuralRelation *neuralRelation=new NeuralRelation;
           do
           {
-            neuralRelation->index=int(brainSize*r3->Rndm());
+            neuralRelation->index=int((brainSize)*r3->Uniform());
           } while (neuralRelation->index==i);
-          neuralRelation->synapticStrength=r3->Rndm();
-          neuralRelation->distance=r3->Rndm();
-          neuron->push_back_relation(neuralRelation);
+          if (neuralRelation->index==brainSize-1) connectedToNewNeuron=true;
+          neuralRelation->synapticStrength=r3->Uniform();
+          double newDistance=r3->Uniform();
+          // if (newDistance>0.1)
+          {
+            neuralRelation->distance=newDistance;
+            neuron->push_back_relation(neuralRelation);
+          }
+          --j;
         }
         else // Modify the existing connection
         {
           NeuralRelation *neuralRelation=new NeuralRelation;
           neuralRelation->index=parentNeuralRelations.at(j)->index;
-          neuralRelation->synapticStrength=r3->Rndm();
-          double newDistance=(parentNeuralRelations.at(j)->distance)+mu_modConnection*(-0.5+r3->Rndm());
+          neuralRelation->synapticStrength=r3->Uniform();
+          double newDistance=(parentNeuralRelations.at(j)->distance)+mu_modConnection*(-0.5+r3->Uniform());
           if (newDistance<0) newDistance=0;
           if (newDistance>1) newDistance=1;
-          neuralRelation->distance=newDistance;
-          neuron->push_back_relation(neuralRelation);
+          // if (newDistance>0.1)
+          {
+            neuralRelation->distance=newDistance;
+            neuron->push_back_relation(neuralRelation);
+          }
         }
       }
       neurons_.push_back(neuron);
       
       // With 50% probability do a fwd connection of the new neuron to other neurons
-      if (r3->Rndm()>0.5)
+      if (connectedToNewNeuron)
       {
         NeuralRelation *neuralRelation=new NeuralRelation;
         neuralRelation->index=i;
-        neuralRelation->synapticStrength=r3->Rndm();
-        neuralRelation->distance=r3->Rndm();
-        newNeuron->push_back_relation(neuralRelation);
+        neuralRelation->synapticStrength=r3->Uniform();
+        double newDistance=r3->Uniform();
+        // if (newDistance>0.1)
+        {
+          neuralRelation->distance=newDistance;
+          newNeuron->push_back_relation(neuralRelation);
+        }
       }
     }
     neurons_.push_back(newNeuron);

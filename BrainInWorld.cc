@@ -49,9 +49,9 @@ unsigned int nBots=10;
 unsigned int nPredators=5;
   
 // Mutation parameters
-double mu_newNeuron=0.2;
-double mu_newConnection=0.01;
-double mu_modConnection=0.01;
+double mu_newNeuron=0; //0.001;
+double mu_newConnection=0.1;
+double mu_modConnection=0.1;
 
 // Debug Levels
 // bits: xxxx
@@ -120,6 +120,8 @@ int main(int argc, char *argv[])
   if (decodeDebug(debug, 0)==1)
   {
     c_World=new TCanvas("c_World", "Natural Neural Network in Genetic Algorithm", 700, 700);
+    TEllipse *c_safe=new TEllipse(worldSize/2., worldSize/2., 50, 50);
+    c_safe->Draw();
     c_World->Range(0,0,worldSize,worldSize);
   }
   
@@ -142,9 +144,9 @@ int main(int argc, char *argv[])
   int oldGeneration=generations;
   int dtime=0;
   int dtime_predator=0;
-    
+  
   // Time loop
-  while (foods.size()>0 && generations<5e4 && generations_predator<5e4)
+  while (foods.size()>0 && generations<5e4 && generations_predator<1e4)
   {
     
     ++time;
@@ -226,7 +228,8 @@ int main(int argc, char *argv[])
       for (unsigned int j=0; j<bots.size(); ++j)
       {
         double d2=pow(predators.at(i)->x_-bots.at(j)->x_, 2)+pow(predators.at(i)->y_-bots.at(j)->y_, 2);
-        if (d2<13)
+        double d3=pow(bots.at(j)->x_-worldSize/2., 2)+pow(bots.at(j)->y_-worldSize/2., 2);
+        if (d2<13 && d3>2500)
         {
           eatenBot=j;
           if (decodeDebug(debug, 1)==1) std::cout<<"Predator "<<predators.at(i)->name_<<" ate bot "<<j<<std::endl;
@@ -271,7 +274,7 @@ int main(int argc, char *argv[])
       c_World->Update();
     }
     
-    if (decodeDebug(debug, 3)==1 && time%timeStep==0) // Flash histograms
+    if (decodeDebug(debug, 3)==1 && generations%1000==0) // Flash histograms
     {
       for (unsigned int i=0; i<bots.size(); ++i)
       {
@@ -323,14 +326,48 @@ int main(int argc, char *argv[])
       g_dtime_predator_generation->SetName("g_dtime_predator_generation");
       g_dtime_predator_generation->SetTitle("; generations; Time for predator to next meal");
       
-      TFile *file=new TFile("AnalyzeThis.root", "recreate");
-      g_avgBrainSize_time->Write();
-      g_avgBrainSize_generation->Write();
-      g_dtime_generation->Write();
-      g_avgBrainSize_predator_time->Write();
-      g_avgBrainSize_predator_generation->Write();
-      g_dtime_predator_generation->Write();
+      int nSizeMatrix=bots.at(0)->brain_->neurons_.size();
+      TH2F *h_distances_matrix=new TH2F(("h_distances_matrix_"+itoa(generations)).c_str(), "; i, j", nSizeMatrix, 0, nSizeMatrix, nSizeMatrix, 0, nSizeMatrix);
+      TH1F *h_distances=new TH1F(("h_distances_Generation_"+itoa(generations)).c_str(), "; distance", 50, 0, 1.0);
+      for (unsigned int i=0; i<nBots; ++i)
+      {
+        // file->mkdir(("Bot_brain_"+itoa(i)).c_str());
+        Brain *brain=bots.at(i)->brain_;
+        for (unsigned int j=0; j<brain->neurons_.size(); ++j)
+        {
+          Neuron *neuron=brain->neurons_.at(j);
+          double sumDistance=0;
+          for (unsigned int k=0; k<neuron->neuralRelations_.size(); ++k)
+          {
+            sumDistance+=neuron->neuralRelations_.at(k)->distance;
+            h_distances_matrix->Fill(j, neuron->neuralRelations_.at(k)->index, (neuron->neuralRelations_.at(k)->distance)/double(nSizeMatrix*nBots));
+          }
+          h_distances->Fill(sumDistance/double(brain->neurons_.size()), 1./double(nBots));
+        }
+      }
+      
+      TFile *file;
+      if (generations==100) file=new TFile("AnalyzeThis.root", "recreate");
+      else file=new TFile("AnalyzeThis.root", "update");
+      g_avgBrainSize_time->Write(g_avgBrainSize_time->GetName(), 5 );
+      g_avgBrainSize_generation->Write(g_avgBrainSize_generation->GetName(), 5 );
+      g_dtime_generation->Write(g_dtime_generation->GetName(), 5 );
+      g_avgBrainSize_predator_time->Write(g_avgBrainSize_predator_time->GetName(), 5 );
+      g_avgBrainSize_predator_generation->Write(g_avgBrainSize_predator_generation->GetName(), 5 );
+      g_dtime_predator_generation->Write(g_dtime_predator_generation->GetName(), 5 );
+      file->mkdir("Brain");
+      file->cd("Brain");
+      h_distances->Write();
+      h_distances_matrix->Write();
       file->Close();
+      
+      delete g_avgBrainSize_time;
+      delete g_avgBrainSize_generation;
+      delete g_dtime_generation;
+      delete g_avgBrainSize_predator_time;
+      delete g_avgBrainSize_predator_generation;
+      delete g_dtime_predator_generation;
+      delete h_distances;
     }
   }
   

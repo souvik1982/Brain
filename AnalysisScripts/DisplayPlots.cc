@@ -5,7 +5,7 @@
 #include <TCanvas.h>
 #include <iostream>
 #include <TStyle.h>
-#include <TPaveText.h>
+#include <TLegend.h>
 #include <TArrow.h>
 
 #include "/Users/souvik/HbbHbb_Run2/Analysis/TDRStyle.h"
@@ -20,9 +20,10 @@ void DisplayPlots()
   TGraph *g_avgBrainSize_predator_time=(TGraph*)file->Get("g_avgBrainSize_predator_time");
   TGraph *g_avgBrainSize_predator_generation=(TGraph*)file->Get("g_avgBrainSize_predator_generation");
   TGraph *g_dtime_predator_generation=(TGraph*)file->Get("g_dtime_predator_generation");
+  TH1F *h_distances=(TH1F*)file->Get("h_distances"); 
   
   TStyle *tdrStyle=setTDRStyle();
-  tdrStyle->cd();
+  // tdrStyle->cd();
     
   TCanvas *c_avgBrainSize_time=new TCanvas("c_avgBrainSize_time", "c_avgBrainSize_time", 700, 700);
   g_avgBrainSize_time->SetLineColor(kBlue); g_avgBrainSize_time->Draw("AL");
@@ -75,6 +76,17 @@ void DisplayPlots()
   TCanvas *c_dtime_predator_generation=new TCanvas("c_dtime_predator_generation", "c_dtime_predator_generation", 700, 700);
   h_dtime_predator_generation->Draw("HIST");
   c_dtime_predator_generation->SaveAs("c_dtime_predator_generation.png");
+  
+  h_distances->Rebin(2);
+  // h_distances->SetBinContent(1, 0);
+  // h_distances->SetBinContent(2, 0);
+  TCanvas *c_distances=new TCanvas("c_distances", "c_distances", 700, 700);
+  c_distances->SetLogy();
+  h_distances->Draw("hist");
+  leg=new TLegend(0.5, 0.6, 0.7, 0.8);
+  leg->AddEntry(h_distances, "AI Brain", ""); leg->SetLineColor(kWhite); leg->SetFillColor(kWhite);
+  leg->Draw();
+  c_distances->SaveAs("c_distances.png");
 }
 
   
