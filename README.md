@@ -1,5 +1,5 @@
 # Brain
-A biology-inspired Neural Networks evolving through Natural Selection
+Biology-inspired Neural Networks evolving through Natural Selection
 
 I have been developing, in my leisure, an original simulation of a biology-inspired neural network (brain) evolving in a naturally selective environment. I intend to uncover what natural mechanism, analogous to the artificial one of backpropagation, arises in biological networks that allow them to learn within a lifetime. The brains are found to quickly evolve survival behavior.
 
