@@ -120,8 +120,8 @@ int main(int argc, char *argv[])
   if (decodeDebug(debug, 0)==1)
   {
     c_World=new TCanvas("c_World", "Natural Neural Network in Genetic Algorithm", 700, 700);
-    TEllipse *c_safe=new TEllipse(worldSize/2., worldSize/2., 50, 50);
-    c_safe->Draw();
+    // TEllipse *e_safe=new TEllipse(worldSize/2., worldSize/2., 50, 50);
+    // e_safe->Draw();
     c_World->Range(0,0,worldSize,worldSize);
   }
   
@@ -229,7 +229,7 @@ int main(int argc, char *argv[])
       {
         double d2=pow(predators.at(i)->x_-bots.at(j)->x_, 2)+pow(predators.at(i)->y_-bots.at(j)->y_, 2);
         double d3=pow(bots.at(j)->x_-worldSize/2., 2)+pow(bots.at(j)->y_-worldSize/2., 2);
-        if (d2<13 && d3>2500)
+        if (d2<13) // && d3>2500) // Safe
         {
           eatenBot=j;
           if (decodeDebug(debug, 1)==1) std::cout<<"Predator "<<predators.at(i)->name_<<" ate bot "<<j<<std::endl;
