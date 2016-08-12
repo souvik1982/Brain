@@ -40,6 +40,7 @@ ALL RIGHTS RESERVED
 #include "interface/ToolBox.h"
 #include "interface/CommandLineArguments.h"
 
+int skipGenerations=0;
 int timeStep=200;
 double worldSize=100;
 double regenFood=1.0;
@@ -52,6 +53,7 @@ unsigned int nPredators=5;
 double mu_newNeuron=0; //0.001;
 double mu_newConnection=0.1;
 double mu_modConnection=0.1;
+double mu_visualAngle=0.1;
 
 // Debug Levels
 // bits: xxxx
@@ -65,12 +67,13 @@ int main(int argc, char *argv[])
 { 
   // Get command line arguments
   std::map<std::string, int> cmdMap=commandLineArguments(argc, argv);
-  if (cmdMap.find("-debug")!=cmdMap.end())      debug=cmdMap["-debug"];
-  if (cmdMap.find("-timeStep")!=cmdMap.end())   timeStep=cmdMap["-timeStep"];
-  if (cmdMap.find("-worldSize")!=cmdMap.end())  worldSize=cmdMap["-worldSize"];
-  if (cmdMap.find("-nBots")!=cmdMap.end())      nBots=cmdMap["-nBots"];
-  if (cmdMap.find("-nFoods")!=cmdMap.end())     nFoods=cmdMap["-nFoods"];
-  if (cmdMap.find("-nPredators")!=cmdMap.end()) nPredators=cmdMap["-nPredators"];
+  if (cmdMap.find("-debug")!=cmdMap.end())           debug=cmdMap["-debug"];
+  if (cmdMap.find("-skipGenerations")!=cmdMap.end()) skipGenerations=cmdMap["-skipGenerations"];
+  if (cmdMap.find("-timeStep")!=cmdMap.end())        timeStep=cmdMap["-timeStep"];
+  if (cmdMap.find("-worldSize")!=cmdMap.end())       worldSize=cmdMap["-worldSize"];
+  if (cmdMap.find("-nBots")!=cmdMap.end())           nBots=cmdMap["-nBots"];
+  if (cmdMap.find("-nFoods")!=cmdMap.end())          nFoods=cmdMap["-nFoods"];
+  if (cmdMap.find("-nPredators")!=cmdMap.end())      nPredators=cmdMap["-nPredators"];
 
   r3->SetSeed(100);
   
@@ -83,18 +86,18 @@ int main(int argc, char *argv[])
   Bots bots;
   for (unsigned int i=0; i<nBots; ++i)
   {
-    Bot *bot=new Bot(r3->Rndm()*worldSize, r3->Rndm()*worldSize, r3->Rndm()*2.*pi, 30, kBlue, 1.0, "Bot_"+itoa(i), worldSize, debug);
+    Bot *bot=new Bot("Bot", r3->Rndm()*worldSize, r3->Rndm()*worldSize, r3->Rndm()*2.*pi, pi/4., 30, kBlue, 1.0, "Bot_"+itoa(i), worldSize, debug);
     bots.push_back(bot);
   }
-  std::cout<<"Made bots."<<std::endl;
+  std::cout<<"Instantiated bots."<<std::endl;
   
   Bots predators;
   for (unsigned int i=0; i<nPredators; ++i)
   {
-    Bot *predator=new Bot(r3->Rndm()*worldSize, r3->Rndm()*worldSize, r3->Rndm()*2.*pi, 30, kRed, 1.0, "Predator_"+itoa(i), worldSize, debug);
+    Bot *predator=new Bot("Predator", r3->Rndm()*worldSize, r3->Rndm()*worldSize, r3->Rndm()*2.*pi, pi/4., 30, kRed, 1.0, "Predator_"+itoa(i), worldSize, debug);
     predators.push_back(predator);
   }
-  std::cout<<"Made predators."<<std::endl;
+  std::cout<<"Instantiated predators."<<std::endl;
   
   typedef std::vector<Food*> Foods;
   Foods foods;
@@ -103,7 +106,7 @@ int main(int argc, char *argv[])
     Food *food=new Food(r3->Rndm()*worldSize, r3->Rndm()*worldSize, r3->Rndm()*2.*pi, worldSize);
     foods.push_back(food);
   }
-  std::cout<<"Made food."<<std::endl;
+  std::cout<<"Instantiated food."<<std::endl;
   
   std::vector <double> time_vector;
   std::vector <double> time_predator_vector;
@@ -120,7 +123,8 @@ int main(int argc, char *argv[])
   if (decodeDebug(debug, 0)==1)
   {
     c_World=new TCanvas("c_World", "Natural Neural Network in Genetic Algorithm", 700, 700);
-    // TEllipse *e_safe=new TEllipse(worldSize/2., worldSize/2., 50, 50);
+    // Safety Circle
+    // TEllipse *e_safe=new TEllipse(worldSize/2., worldSize/2., 70, 70);
     // e_safe->Draw();
     c_World->Range(0,0,worldSize,worldSize);
   }
@@ -155,7 +159,8 @@ int main(int argc, char *argv[])
     
     for (unsigned int i=0; i<bots.size(); ++i)
     {
-      bots.at(i)->seeFood(&foods);
+      bots.at(i)->seeFoods(&foods);
+      bots.at(i)->seeBots(&bots);
       bots.at(i)->seeBots(&predators);
       bots.at(i)->stepInTime();
     }
@@ -165,8 +170,9 @@ int main(int argc, char *argv[])
     }
     for (unsigned int i=0; i<predators.size(); ++i)
     {
-      predators.at(i)->seeFood(&foods);
+      predators.at(i)->seeFoods(&foods);
       predators.at(i)->seeBots(&bots);
+      predators.at(i)->seeBots(&predators);
       predators.at(i)->stepInTime();
     }
   
@@ -200,7 +206,7 @@ int main(int argc, char *argv[])
           foods.push_back(food);
         }
         
-        Bot *bot=new Bot(bots.at(i), mu_newNeuron, mu_newConnection, mu_modConnection);
+        Bot *bot=new Bot(bots.at(i), mu_newNeuron, mu_newConnection, mu_modConnection, mu_visualAngle);
         bots.push_back(bot);
         ++generations;
         
@@ -229,7 +235,7 @@ int main(int argc, char *argv[])
       {
         double d2=pow(predators.at(i)->x_-bots.at(j)->x_, 2)+pow(predators.at(i)->y_-bots.at(j)->y_, 2);
         double d3=pow(bots.at(j)->x_-worldSize/2., 2)+pow(bots.at(j)->y_-worldSize/2., 2);
-        if (d2<13) // && d3>2500) // Safe
+        if (d2<13) // && d3>4900) // Safe
         {
           eatenBot=j;
           if (decodeDebug(debug, 1)==1) std::cout<<"Predator "<<predators.at(i)->name_<<" ate bot "<<j<<std::endl;
@@ -244,10 +250,10 @@ int main(int argc, char *argv[])
         delete *(bots.begin()+eatenBot);
         bots.erase(bots.begin()+eatenBot);
         
-        Bot *bot=new Bot(bots.at(0), mu_newNeuron, mu_newConnection, mu_modConnection);
+        Bot *bot=new Bot(bots.at(0), mu_newNeuron, mu_newConnection, mu_modConnection, mu_visualAngle);
         bots.push_back(bot);
         
-        Bot *predator=new Bot(predators.at(i), mu_newNeuron, mu_newConnection, mu_modConnection);
+        Bot *predator=new Bot(predators.at(i), mu_newNeuron, mu_newConnection, mu_modConnection, mu_visualAngle);
         predators.push_back(predator);
         ++generations_predator;
         
@@ -265,7 +271,7 @@ int main(int argc, char *argv[])
     }
     
     // Draw visualization
-    if (decodeDebug(debug, 0)==1 && time%timeStep==0)
+    if (decodeDebug(debug, 0)==1 && time%timeStep==0 && generations>skipGenerations)
     {
       c_World->cd();
       for (unsigned int i=0; i<bots.size(); ++i) bots.at(i)->draw();

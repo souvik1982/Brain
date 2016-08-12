@@ -18,6 +18,7 @@ ALL RIGHTS RESERVED
 
 Food::Food(double x, double y, double theta, double worldSize, int debug): Entity(worldSize)
 {
+  type_="Food";
   x_=x;
   y_=y;
   theta_=theta;

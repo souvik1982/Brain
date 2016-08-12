@@ -26,6 +26,7 @@ class Bot: public Entity
     Brain *brain_;
     std::string name_;
     TLine *line1_, *line2_;
+    double visualAngle_;
     int bodyColor_;
     double speed_;
     double worldSize_;
@@ -34,16 +35,17 @@ class Bot: public Entity
     
   public:
   
-    Bot(double x, double y, double theta, int brainSize, int bodyColor, double speed, std::string name, double worldSize, int debug = 1);
-    Bot(Bot *parentBot, double mu_newNeuron, double mu_newConnection, double mu_modConnection);
+    Bot(std::string type, double x, double y, double theta, double visualAngle, int brainSize, int bodyColor, double speed, std::string name, double worldSize, int debug = 1);
+    Bot(Bot *parentBot, double mu_newNeuron, double mu_newConnection, double mu_modConnection, double mu_visualAngle);
     ~Bot();
     
     void draw();
     void moveForward();
     void moveBackward();
-    bool inSight(double x, double y);
-    void seeFood(std::vector<Food*> *foods);
+    void seeEntity(Entity *entity);
+    void seeFoods(std::vector<Food*> *foods);
     void seeBots(std::vector<Bot*> *bots);
+    
     void stepInTime();
     
     void printBrain();

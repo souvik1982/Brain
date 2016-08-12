@@ -23,6 +23,7 @@ class Entity
     TEllipse *circle_;
     double worldSize_;
     double x_, y_, theta_;
+    std::string type_;
     
   public:
   
