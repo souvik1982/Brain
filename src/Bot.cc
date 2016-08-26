@@ -36,10 +36,19 @@ Bot::Bot(std::string type, double x, double y, double theta, double visualAngle,
     circle_=new TEllipse(x, y, 2.);
     circle_->SetLineColor(kBlack);
     circle_->SetFillColor(bodyColor_);
-    line1_=new TLine(x_, y_, x_+20.*cos(theta_+visualAngle_/2.), y_+20.*sin(theta_+visualAngle_/2.));
-    line2_=new TLine(x_, y_, x_+20.*cos(theta_-visualAngle_/2.), y_+20.*sin(theta_+visualAngle_/2.));
-    line1_->SetLineColor(bodyColor_);
-    line2_->SetLineColor(bodyColor_);
+    visRange1_=new TEllipse(x_, y_, 30, 30, 360.+(theta_-visualAngle_/2.)*180./pi, 360.+(theta_+visualAngle_/2.)*180./pi);
+    visRange2_=new TEllipse(x_, y_, 60, 60, 360.+(theta_-visualAngle_/2.)*180./pi, 360.+(theta_+visualAngle_/2.)*180./pi);
+    visRange3_=new TEllipse(x_, y_, 100, 100, 360.+(theta_-visualAngle_/2.)*180./pi, 360.+(theta_+visualAngle_/2.)*180./pi);
+    visPeriphery1_=new TLine(x_, y_, x_+100.*cos(theta_+visualAngle_/6.), y_+100.*sin(theta_+visualAngle_/6.));
+    visPeriphery2_=new TLine(x_, y_, x_+100.*cos(theta_-visualAngle_/6.), y_+100.*sin(theta_-visualAngle_/6.));
+    visRange1_->SetFillStyle(0);
+    visRange2_->SetFillStyle(0);
+    visRange3_->SetFillStyle(0);
+    visRange1_->SetLineColor(bodyColor_);
+    visRange2_->SetLineColor(bodyColor_);
+    visRange3_->SetLineColor(bodyColor_);
+    visPeriphery1_->SetLineColor(bodyColor_);
+    visPeriphery2_->SetLineColor(bodyColor_);
   }
 }
 
@@ -66,10 +75,19 @@ Bot::Bot(Bot *parentBot, double mu_newNeuron, double mu_newConnection, double mu
     circle_=new TEllipse(x_, y_, 2.);
     circle_->SetLineColor(kBlack);
     circle_->SetFillColor(bodyColor_);
-    line1_=new TLine(x_, y_, x_+20.*cos(theta_+visualAngle_/2.), y_+20.*sin(theta_+visualAngle_/2.));
-    line2_=new TLine(x_, y_, x_+20.*cos(theta_-visualAngle_/2.), y_+20.*sin(theta_+visualAngle_/2.));
-    line1_->SetLineColor(bodyColor_);
-    line2_->SetLineColor(bodyColor_);
+    visRange1_=new TEllipse(x_, y_, 30, 30, 360.+(theta_-visualAngle_/2.)*180./pi, 360.+(theta_+visualAngle_/2.)*180./pi);
+    visRange2_=new TEllipse(x_, y_, 60, 60, 360.+(theta_-visualAngle_/2.)*180./pi, 360.+(theta_+visualAngle_/2.)*180./pi);
+    visRange3_=new TEllipse(x_, y_, 100, 100, 360.+(theta_-visualAngle_/2.)*180./pi, 360.+(theta_+visualAngle_/2.)*180./pi);
+    visPeriphery1_=new TLine(x_, y_, x_+100.*cos(theta_+visualAngle_/6.), y_+100.*sin(theta_+visualAngle_/6.));
+    visPeriphery2_=new TLine(x_, y_, x_+100.*cos(theta_-visualAngle_/6.), y_+100.*sin(theta_-visualAngle_/6.));
+    visRange1_->SetFillStyle(0);
+    visRange2_->SetFillStyle(0);
+    visRange3_->SetFillStyle(0);
+    visRange1_->SetLineColor(bodyColor_);
+    visRange2_->SetLineColor(bodyColor_);
+    visRange3_->SetLineColor(bodyColor_);
+    visPeriphery1_->SetLineColor(bodyColor_);
+    visPeriphery2_->SetLineColor(bodyColor_);
   }
   
   double rnd=r3->Rndm();
@@ -84,8 +102,11 @@ Bot::~Bot()
   if (decodeDebug(debug_, 0)==1)
   {
     circle_->Delete();
-    line1_->Delete();
-    line2_->Delete();
+    visRange1_->Delete();
+    visRange2_->Delete();
+    visRange3_->Delete();
+    visPeriphery1_->Delete();
+    visPeriphery2_->Delete();
   }
   delete brain_;
 }
@@ -96,18 +117,35 @@ void Bot::draw()
   {
     circle_->SetX1(x_);
     circle_->SetY1(y_);
-    line1_->SetX1(x_);
-    line1_->SetY1(y_);
-    line1_->SetX2(x_+20.*cos(theta_+visualAngle_/2.));
-    line1_->SetY2(y_+20.*sin(theta_+visualAngle_/2.));
-    line2_->SetX1(x_);
-    line2_->SetY1(y_);
-    line2_->SetX2(x_+20.*cos(theta_-visualAngle_/2.));
-    line2_->SetY2(y_+20.*sin(theta_-visualAngle_/2.));
-  
+    double angle1=360.+(theta_-visualAngle_/2.)*180./pi;
+    double angle2=360.+(theta_+visualAngle_/2.)*180./pi;
+    visRange1_->SetX1(x_);
+    visRange1_->SetY1(y_);
+    visRange1_->SetPhimin(angle1);
+    visRange1_->SetPhimax(angle2);
+    visRange2_->SetX1(x_);
+    visRange2_->SetY1(y_);
+    visRange2_->SetPhimin(angle1);
+    visRange2_->SetPhimax(angle2);
+    visRange3_->SetX1(x_);
+    visRange3_->SetY1(y_);
+    visRange3_->SetPhimin(angle1);
+    visRange3_->SetPhimax(angle2);
+    visPeriphery1_->SetX1(x_);
+    visPeriphery1_->SetY1(y_);
+    visPeriphery1_->SetX2(x_+100.*cos(theta_+visualAngle_/6.));
+    visPeriphery1_->SetY2(y_+100.*sin(theta_+visualAngle_/6.));
+    visPeriphery2_->SetX1(x_);
+    visPeriphery2_->SetY1(y_);
+    visPeriphery2_->SetX2(x_+100.*cos(theta_-visualAngle_/6.));
+    visPeriphery2_->SetY2(y_+100.*sin(theta_-visualAngle_/6.));
+    
     circle_->Draw();
-    line1_->Draw();
-    line2_->Draw();
+    visRange1_->Draw();
+    visRange2_->Draw();
+    visRange3_->Draw();
+    visPeriphery1_->Draw();
+    visPeriphery2_->Draw();
   }
 }
 

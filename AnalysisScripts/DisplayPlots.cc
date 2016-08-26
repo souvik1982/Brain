@@ -1,4 +1,5 @@
 #include <TH1F.h>
+#include <TH2F.h>
 #include <TGraph.h>
 #include <TFile.h>
 #include <TLegend.h>
@@ -8,22 +9,23 @@
 #include <TLegend.h>
 #include <TArrow.h>
 
-#include "/Users/souvik/HbbHbb_Run2/Analysis/TDRStyle.h"
+#include "tdrstyle.h"
 
-void DisplayPlots()
+void DisplayPlots(std::string filename)
 {
-  TFile *file=new TFile("../AnalyzeThis.root");
+  TFile *file=new TFile(filename.c_str());
   
   TGraph *g_avgBrainSize_time=(TGraph*)file->Get("g_avgBrainSize_time");
   TGraph *g_avgBrainSize_generation=(TGraph*)file->Get("g_avgBrainSize_generation");
   TGraph *g_dtime_generation=(TGraph*)file->Get("g_dtime_generation");
+  TGraph *g_dtime_time=(TGraph*)file->Get("g_dtime_time");
   TGraph *g_avgBrainSize_predator_time=(TGraph*)file->Get("g_avgBrainSize_predator_time");
   TGraph *g_avgBrainSize_predator_generation=(TGraph*)file->Get("g_avgBrainSize_predator_generation");
   TGraph *g_dtime_predator_generation=(TGraph*)file->Get("g_dtime_predator_generation");
-  TH1F *h_distances=(TH1F*)file->Get("h_distances"); 
+  TGraph *g_dtime_predator_time=(TGraph*)file->Get("g_dtime_predator_time");
+  TH2F *h_distances=(TH2F*)file->Get("Brain/h_distances_matrix_6000"); 
   
   TStyle *tdrStyle=setTDRStyle();
-  // tdrStyle->cd();
     
   TCanvas *c_avgBrainSize_time=new TCanvas("c_avgBrainSize_time", "c_avgBrainSize_time", 700, 700);
   g_avgBrainSize_time->SetLineColor(kBlue); g_avgBrainSize_time->Draw("AL");
@@ -58,7 +60,8 @@ void DisplayPlots()
   h_dtime_generation->Scale(1./double(rebin));
   h_dtime_generation->SetLineColor(kBlue);
   TCanvas *c_dtime_generation=new TCanvas("c_dtime_generation", "c_dtime_generation", 700, 700);
-  h_dtime_generation->Draw("HIST");
+  c_dtime_generation->SetLogy();
+  h_dtime_generation->Draw("HIST E");
   c_dtime_generation->SaveAs("c_dtime_generation.png");
   
   unsigned int nGenerations_predator=g_dtime_predator_generation->GetN();
@@ -74,16 +77,43 @@ void DisplayPlots()
   h_dtime_predator_generation->Scale(1./double(rebin));
   h_dtime_predator_generation->SetLineColor(kRed);
   TCanvas *c_dtime_predator_generation=new TCanvas("c_dtime_predator_generation", "c_dtime_predator_generation", 700, 700);
-  h_dtime_predator_generation->Draw("HIST");
+  c_dtime_predator_generation->SetLogy();
+  h_dtime_predator_generation->Draw("HIST E");
   c_dtime_predator_generation->SaveAs("c_dtime_predator_generation.png");
   
-  h_distances->Rebin(2);
+  TH1F *h_dtime_time=new TH1F("h_dtime_time", "; time; Average time to next meal", 100, 0, 1500000);
+  for (unsigned int i=0; i<g_dtime_time->GetN(); ++i)
+  {
+    double x, y;
+    g_dtime_time->GetPoint(i, x, y);
+    h_dtime_time->Fill(x, y);
+  }
+  // TH1F *h_dtime_predator_time=(TH1F*)h_dtime_time->Clone();
+  // h_dtime_predator_time->Reset();
+  // for (unsigned int i=0; i<g_dtime_predator_time->GetN(); ++i)
+  // {
+  //   double x_predator, y_predator;
+  //   g_dtime_predator_time->GetPoint(i, x_predator, y_predator);
+  //   h_dtime_predator_time->Fill(x_predator, y_predator);
+  // }
+  // rebin=100000;
+  // h_dtime_time->Rebin(rebin);
+  // h_dtime_time->Scale(1./double(rebin));
+  h_dtime_time->SetLineColor(kBlue);
+  //h_dtime_predator_time->Rebin(rebin);
+  //h_dtime_predator_time->Scale(1./double(rebin));
+  // h_dtime_predator_time->SetLineColor(kRed);
+  TCanvas *c_dtime_time=new TCanvas("c_dtime_time", "c_dtime_time", 700, 700);
+  // c_dtime_time->SetLogy();
+  // h_dtime_predator_time->Draw("HIST");
+  h_dtime_time->Draw("HIST");
+  c_dtime_time->SaveAs("c_dtime_time.png");
+  
   // h_distances->SetBinContent(1, 0);
   // h_distances->SetBinContent(2, 0);
   TCanvas *c_distances=new TCanvas("c_distances", "c_distances", 700, 700);
-  c_distances->SetLogy();
-  h_distances->Draw("hist");
-  leg=new TLegend(0.5, 0.6, 0.7, 0.8);
+  h_distances->Draw("colz");
+  leg=new TLegend(0.1, 0.9, 0.9, 1.0);
   leg->AddEntry(h_distances, "AI Brain", ""); leg->SetLineColor(kWhite); leg->SetFillColor(kWhite);
   leg->Draw();
   c_distances->SaveAs("c_distances.png");

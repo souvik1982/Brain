@@ -51,9 +51,9 @@ unsigned int nPredators=5;
   
 // Mutation parameters
 double mu_newNeuron=0; //0.001;
-double mu_newConnection=0.1;
-double mu_modConnection=0.1;
-double mu_visualAngle=0.1;
+double mu_newConnection=0.05;
+double mu_modConnection=0.05;
+double mu_visualAngle=0.05;
 
 // Debug Levels
 // bits: xxxx
@@ -160,7 +160,7 @@ int main(int argc, char *argv[])
     for (unsigned int i=0; i<bots.size(); ++i)
     {
       bots.at(i)->seeFoods(&foods);
-      bots.at(i)->seeBots(&bots);
+      // bots.at(i)->seeBots(&bots);
       bots.at(i)->seeBots(&predators);
       bots.at(i)->stepInTime();
     }
@@ -172,7 +172,7 @@ int main(int argc, char *argv[])
     {
       predators.at(i)->seeFoods(&foods);
       predators.at(i)->seeBots(&bots);
-      predators.at(i)->seeBots(&predators);
+      // predators.at(i)->seeBots(&predators);
       predators.at(i)->stepInTime();
     }
   
@@ -278,6 +278,7 @@ int main(int argc, char *argv[])
       for (unsigned int i=0; i<foods.size(); ++i) foods.at(i)->draw();
       for (unsigned int i=0; i<predators.size(); ++i) predators.at(i)->draw();
       c_World->Update();
+      // c_World->SaveAs(("Movie/c_World_"+itoa(time)+".png").c_str());
     }
     
     if (decodeDebug(debug, 3)==1 && generations%1000==0) // Flash histograms
@@ -320,6 +321,10 @@ int main(int argc, char *argv[])
       g_dtime_generation->SetName("g_dtime_generation");
       g_dtime_generation->SetTitle("; generations; Time to next meal");
       
+      TGraph *g_dtime_time=new TGraph(dtime_vector.size(), &time_vector[0], &dtime_vector[0]);
+      g_dtime_time->SetName("g_dtime_time");
+      g_dtime_time->SetTitle("; time steps; Time to next meal");
+      
       TGraph *g_avgBrainSize_predator_time=new TGraph(avgBrainSize_predator_vector.size(), &time_predator_vector[0], &avgBrainSize_predator_vector[0]);
       g_avgBrainSize_predator_time->SetName("g_avgBrainSize_predator_time");
       g_avgBrainSize_predator_time->SetTitle("; time steps; Average size of predator brains");
@@ -331,6 +336,10 @@ int main(int argc, char *argv[])
       TGraph *g_dtime_predator_generation=new TGraph(dtime_predator_vector.size(), &generation_predator_vector[0], &dtime_predator_vector[0]);
       g_dtime_predator_generation->SetName("g_dtime_predator_generation");
       g_dtime_predator_generation->SetTitle("; generations; Time for predator to next meal");
+      
+      TGraph *g_dtime_predator_time=new TGraph(dtime_predator_vector.size(), &time_vector[0], &dtime_predator_vector[0]);
+      g_dtime_predator_time->SetName("g_dtime_predator_time");
+      g_dtime_predator_time->SetTitle("; time steps; Time to next meal");
       
       int nSizeMatrix=bots.at(0)->brain_->neurons_.size();
       TH2F *h_distances_matrix=new TH2F(("h_distances_matrix_"+itoa(generations)).c_str(), "; i, j", nSizeMatrix, 0, nSizeMatrix, nSizeMatrix, 0, nSizeMatrix);
@@ -358,9 +367,11 @@ int main(int argc, char *argv[])
       g_avgBrainSize_time->Write(g_avgBrainSize_time->GetName(), 5 );
       g_avgBrainSize_generation->Write(g_avgBrainSize_generation->GetName(), 5 );
       g_dtime_generation->Write(g_dtime_generation->GetName(), 5 );
+      g_dtime_time->Write(g_dtime_time->GetName(), 5 );
       g_avgBrainSize_predator_time->Write(g_avgBrainSize_predator_time->GetName(), 5 );
       g_avgBrainSize_predator_generation->Write(g_avgBrainSize_predator_generation->GetName(), 5 );
       g_dtime_predator_generation->Write(g_dtime_predator_generation->GetName(), 5 );
+      g_dtime_predator_time->Write(g_dtime_predator_time->GetName(), 5 );
       file->mkdir("Brain");
       file->cd("Brain");
       h_distances->Write();
@@ -370,9 +381,11 @@ int main(int argc, char *argv[])
       delete g_avgBrainSize_time;
       delete g_avgBrainSize_generation;
       delete g_dtime_generation;
+      delete g_dtime_time;
       delete g_avgBrainSize_predator_time;
       delete g_avgBrainSize_predator_generation;
       delete g_dtime_predator_generation;
+      delete g_dtime_predator_time;
       delete h_distances;
     }
   }

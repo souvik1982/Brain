@@ -25,7 +25,8 @@ class Bot: public Entity
   
     Brain *brain_;
     std::string name_;
-    TLine *line1_, *line2_;
+    TEllipse *visRange1_, *visRange2_, *visRange3_;
+    TLine *visPeriphery1_, *visPeriphery2_;
     double visualAngle_;
     int bodyColor_;
     double speed_;
