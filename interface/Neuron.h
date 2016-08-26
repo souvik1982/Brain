@@ -30,8 +30,14 @@ typedef std::vector<Neuron*> Neurons;
 class Neuron
 {
   public:
+    double activationThreshold_;
+    double synapticReinforcement_;
+    double synapticDecay_;
+    double potentialDecay_;
+  
     double potential_;
     double potential_buffer_;
+    double spontaneousRate_;
     NeuralRelations neuralRelations_;
     
   public:

@@ -22,8 +22,14 @@ TRandom3 *r3=new TRandom3();
 
 Neuron::Neuron()
 {
+  activationThreshold_=0.8;
+  synapticReinforcement_=0.8;
+  synapticDecay_=0.8;
+  potentialDecay_=0.99;
+  
   potential_=0;
   potential_buffer_=0;
+  spontaneousRate_=0.05;
 }
 
 void Neuron::push_back_relation(NeuralRelation *relation)
@@ -34,12 +40,12 @@ void Neuron::push_back_relation(NeuralRelation *relation)
 void Neuron::receive(double charge)
 {
   potential_buffer_+=charge;
-  if (potential_buffer_>2.) potential_buffer_=2.;
+  if (potential_buffer_>1.) potential_buffer_=1.;
 }
 
 void Neuron::stepInTime1(Neurons *neurons)
 {
-  if (potential_>=0.8 || r3->Rndm()>0.95) // fire
+  if (potential_>=activationThreshold_ || r3->Rndm()<spontaneousRate_) // fire
   {
     double totalSynapticWeight=0;
     for (unsigned int i=0; i<neuralRelations_.size(); ++i) totalSynapticWeight+=neuralRelations_.at(i)->synapticStrength;
@@ -48,7 +54,7 @@ void Neuron::stepInTime1(Neurons *neurons)
       Neuron *targetNeuron=neurons->at(neuralRelations_.at(i)->index);
       double synapticStrength=neuralRelations_.at(i)->synapticStrength;
       targetNeuron->receive((synapticStrength/totalSynapticWeight)*(neuralRelations_.at(i)->distance));
-      neuralRelations_.at(i)->synapticStrength=synapticStrength+0.8*(1.-synapticStrength);
+      neuralRelations_.at(i)->synapticStrength=synapticStrength+synapticReinforcement_*(1.-synapticStrength);
     }
     potential_=0;
   }
@@ -56,9 +62,11 @@ void Neuron::stepInTime1(Neurons *neurons)
   {
     for (unsigned int i=0; i<neuralRelations_.size(); ++i)
     {
-      (neuralRelations_.at(i)->synapticStrength)*=0.8;
+      (neuralRelations_.at(i)->synapticStrength)*=synapticDecay_;
       if (neuralRelations_.at(i)->synapticStrength<1e-6) (neuralRelations_.at(i)->synapticStrength)=1e-6;
     }
+    potential_*=potentialDecay_;
+    if (potential_<1e-6) potential_=0;
   }
 }
 

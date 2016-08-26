@@ -150,7 +150,7 @@ int main(int argc, char *argv[])
   int dtime_predator=0;
   
   // Time loop
-  while (foods.size()>0 && generations<5e4 && generations_predator<1e4)
+  while (foods.size()>0)
   {
     
     ++time;
@@ -342,7 +342,8 @@ int main(int argc, char *argv[])
       g_dtime_predator_time->SetTitle("; time steps; Time to next meal");
       
       int nSizeMatrix=bots.at(0)->brain_->neurons_.size();
-      TH2F *h_distances_matrix=new TH2F(("h_distances_matrix_"+itoa(generations)).c_str(), "; i, j", nSizeMatrix, 0, nSizeMatrix, nSizeMatrix, 0, nSizeMatrix);
+      TH1F *h_spontaneity=new TH1F(("h_spontaneity_"+itoa(generations)).c_str(), "; i^{th} Neuron", nSizeMatrix, 0, nSizeMatrix);
+      TH2F *h_distances_matrix=new TH2F(("h_distances_matrix_"+itoa(generations)).c_str(), "; i^{th} Neuron; j^{th} Neuron", nSizeMatrix, 0, nSizeMatrix, nSizeMatrix, 0, nSizeMatrix);
       TH1F *h_distances=new TH1F(("h_distances_Generation_"+itoa(generations)).c_str(), "; distance", 50, 0, 1.0);
       for (unsigned int i=0; i<nBots; ++i)
       {
@@ -351,6 +352,7 @@ int main(int argc, char *argv[])
         for (unsigned int j=0; j<brain->neurons_.size(); ++j)
         {
           Neuron *neuron=brain->neurons_.at(j);
+          h_spontaneity->Fill(j, neuron->spontaneousRate_/double(nBots));
           double sumDistance=0;
           for (unsigned int k=0; k<neuron->neuralRelations_.size(); ++k)
           {
@@ -374,6 +376,7 @@ int main(int argc, char *argv[])
       g_dtime_predator_time->Write(g_dtime_predator_time->GetName(), 5 );
       file->mkdir("Brain");
       file->cd("Brain");
+      h_spontaneity->Write();
       h_distances->Write();
       h_distances_matrix->Write();
       file->Close();
@@ -386,6 +389,8 @@ int main(int argc, char *argv[])
       delete g_avgBrainSize_predator_generation;
       delete g_dtime_predator_generation;
       delete g_dtime_predator_time;
+      delete h_spontaneity;
+      delete h_distances_matrix;
       delete h_distances;
     }
   }
