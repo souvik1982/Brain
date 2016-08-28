@@ -48,9 +48,9 @@ double regenFood=1.0;
 unsigned int nFoods=5;
 unsigned int nBots=10;
 unsigned int nPredators=5;
-  
+
 // Mutation parameters
-double mu_newNeuron=0; //0.001;
+double mu_newNeuron=0; // 0.001;
 double mu_newConnection=0.05;
 double mu_modConnection=0.05;
 double mu_visualAngle=0.05;
