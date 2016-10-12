@@ -24,12 +24,12 @@ Neuron::Neuron()
 {
   activationThreshold_=0.4;
   synapticReinforcement_=0.8;
-  synapticDecay_=0.99;
-  potentialDecay_=0.9;
+  synapticDecay_=0.999; // 0.999
+  potentialDecay_=0.99; // 0.9
   
   potential_=0;
   potential_buffer_=0;
-  spontaneousRate_=0.05;
+  spontaneousRate_=0.05; // 0.05
 }
 
 void Neuron::push_back_relation(NeuralRelation *relation)
@@ -57,7 +57,8 @@ void Neuron::stepInTime1(Neurons *neurons)
       targetNeuron->receive(0.5*(synapticStrength/totalSynapticWeight)*(neuralRelations_.at(i)->distance));
       neuralRelations_.at(i)->synapticStrength=synapticStrength+synapticReinforcement_*(1.-synapticStrength);
     }
-    potential_=-0.01;
+    potential_=0; // -0.01;
+    // std::cout<<"Neuron fired"<<std::endl;
   }
   else
   {

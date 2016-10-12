@@ -249,10 +249,10 @@ void Bot::seeBots(std::vector<Bot*> *bots)
 void Bot::stepInTime()
 {
   brain_->stepInTime();
-  if (brain_->neurons_.at(12)->potential()>0.8) moveForward();
-  if (brain_->neurons_.at(13)->potential()>0.8) turnLeft();
-  if (brain_->neurons_.at(14)->potential()>0.8) turnRight();
-  if (brain_->neurons_.at(15)->potential()>0.8) moveBackward();
+  if (brain_->neurons_.at(12)->potential()>0.4) moveForward();
+  if (brain_->neurons_.at(13)->potential()>0.4) turnLeft();
+  if (brain_->neurons_.at(14)->potential()>0.4) turnRight();
+  if (brain_->neurons_.at(15)->potential()>0.4) moveBackward();
 }
 
 void Bot::printBrain()

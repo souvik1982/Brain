@@ -281,7 +281,7 @@ int main(int argc, char *argv[])
       // c_World->SaveAs(("Movie/c_World_"+itoa(time)+".png").c_str());
     }
     
-    if (decodeDebug(debug, 3)==1 && generations%1000==0) // Flash histograms
+    if (decodeDebug(debug, 3)==1 && time%timeStep==0 && generations>skipGenerations) // Flash histograms
     {
       for (unsigned int i=0; i<bots.size(); ++i)
       {
