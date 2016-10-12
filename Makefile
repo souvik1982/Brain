@@ -9,6 +9,9 @@ clean:
 BrainInWorld: Neuron.o Brain.o Entity.o Fire.o Food.o Bot.o BrainInWorld.o
 	c++ lib/Neuron.o lib/Brain.o lib/Entity.o lib/Fire.o lib/Food.o lib/Bot.o lib/BrainInWorld.o -o BrainInWorld $(ROOTFLAGS) $(ROOTLIBS) -O2
 
+TestNeuron: Neuron.o TestNeuron.o
+	c++ lib/Neuron.o lib/TestNeuron.o -o TestNeuron $(ROOTFLAGS) $(ROOTLIBS) -O2
+
 Neuron.o: src/Neuron.cc
 	c++ -c src/Neuron.cc -c $(ROOTFLAGS) -O2
 	mv Neuron.o lib/
@@ -35,5 +38,8 @@ Bot.o: src/Bot.cc
 
 BrainInWorld.o: BrainInWorld.cc
 	c++ -c BrainInWorld.cc -c $(ROOTFLAGS) -O2
-	mv BrainInWorld.o lib/BrainInWorld.o
+	mv BrainInWorld.o lib/
 
+TestNeuron.o: test/TestNeuron.cc
+	c++ -c test/TestNeuron.cc -c $(ROOTFLAGS) -O2
+	mv TestNeuron.o lib/ 

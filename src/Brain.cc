@@ -80,6 +80,7 @@ Brain::Brain(Brain *parentBrain, int diffBrainSize, int debug, std::string name,
     {
       Neuron *neuron=new Neuron();
       Neuron *parentNeuron=parentBrain->neurons_.at(i);
+      neuron->spontaneousRate_=parentNeuron->spontaneousRate_+mu_modConnection*0.1*(-0.5+r3->Uniform());
       NeuralRelations parentNeuralRelations=parentNeuron->neuralRelations_;
       for (unsigned int j=0; j<parentNeuralRelations.size(); ++j)
       {
@@ -129,6 +130,7 @@ Brain::Brain(Brain *parentBrain, int diffBrainSize, int debug, std::string name,
     {
       Neuron *neuron=new Neuron();
       Neuron *parentNeuron=parentBrain->neurons_.at(i);
+      neuron->spontaneousRate_=parentNeuron->spontaneousRate_+mu_modConnection*0.1*(-0.5+r3->Uniform());
       NeuralRelations parentNeuralRelations=parentNeuron->neuralRelations_;
       bool connectedToNewNeuron=false;
       for (unsigned int j=0; j<parentNeuralRelations.size(); ++j)

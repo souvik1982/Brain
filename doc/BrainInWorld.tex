@@ -1,0 +1,35 @@
+\documentclass[10pt,letterpaper]{article}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{geometry}
+\usepackage{amsmath}
+
+\begin{document}
+
+\title{A biology-inspired neural network evolving through natural selection}
+\author{Souvik Das}
+\maketitle
+
+\begin{abstract}
+We describe a biology-inspired time-stepped simulation of a neural network that structures itself by competing against mutated copies of itself. The simulated neurons seek to capture the functional essence of a biological neuron as a function of time. We find a condition between the inputs to the neuron and its activation potential that needs to be met for the neuron to fire continuously, and conjecture that a similar condition may also exist in biology. The neural network encodes synaptic chemical concentrations between neurons that changes over the course of a network's lifetime based on simple rules of reinforcement and decay. The network also encodes the physical distance or connectivity between neurons that evolves over generations through natural selection. Multiple copies of these neural networks are instantiated in a game world, each with small random mutations in the connectivities.
+
+
+
+\end{abstract}
+\clearpage
+
+\tableofcontents
+\clearpage
+
+\input{Neuron}
+
+\input{Brain}
+
+\input{World}
+
+\input{LearningI}
+
+\input{LearningII}
+
+\end{document} 
+
