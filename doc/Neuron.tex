@@ -31,17 +31,27 @@ This can be solved for $n$ to derive the output frequency of the neuron $f_{out}
 n = \frac{\log(1-\frac{Q_{th}}{q}(1-k^t))}{t\log(k)}-1
 \end{equation}
 
-For this to be true, i.e. for the total potential to ever reach $Q_{th}$, the argument of the logarithm in the numerator has to be positive. This implies a minimum frequency of input firing given by Eq.~\ref{eq:neuron:fin}. If this condition is not met, the neuron does not reach the firing threshold as shown by the blue curve in Fig.~\ref{fig:c_potential_time_sawtooth}a. When the condition is met, the neuron repeatedly fires in intervals of $nt$ given by Eq.~\ref{eq:neuron:n} as shown by the red curve in Fig.~\ref{fig:c_potential_time_sawtooth}b.
+For this to be true, i.e. for the total potential to ever reach $Q_{th}$, the argument of the logarithm in the numerator has to be positive. This implies a minimum frequency of input firing given by Eq.~\ref{eq:neuron:fin}. If this condition is not met, the neuron does not reach the firing threshold as shown by the blue curve in Fig.~\ref{fig:c_potential_time_sawtooth}a. When the condition is met, the neuron repeatedly fires in intervals of $nt$ given by Eq.~\ref{eq:neuron:n} as shown by the red curve in Fig.~\ref{fig:c_potential_time_sawtooth}b. \textit{We conjecture that such a condition may also exist for the firing of biological neurons.}
 
 \begin{equation}
 \label{eq:neuron:fin}
-\frac{1}{t} = f_{in} > \frac{\log(1-q/Q_{th})}{\log(k)}
+\frac{1}{f_{in}} = t < \frac{\log(1-q/Q_{th})}{\log(k)}
 \end{equation}
 
 \begin{figure}[thp]
 \centering
 \includegraphics[width=0.49\textwidth]{c_potential_time_sawtooth_a.png}
 \includegraphics[width=0.49\textwidth]{c_potential_time_sawtooth_b.png}
-\caption{(a) }
+\caption{(a) LEFT. The neuron is programmed with a potential threshold $Q_{th}$ = 0.4, and a potential decay constant $k_p$ = 0.90. It is stimulated with potentials of $q$ = 0.1 applied every $t$ = 3 timesteps. According to Eq.~\ref{eq:neuron:fin}, $t$ needs to be less than 2.7 for the neuron to fire and therefore the neuron does not fire. (b) RIGHT. The neuron is now stimulated with $q$ = 0.1 applied every $t$ = 2 timesteps, and therefore it fires.}
 \label{fig:c_potential_time_sawtooth}
 \end{figure}
+
+... \textit{Show the relationship between output and input frequencies. Connection with sigmoid.}
+
+\subsection{Synaptic weights}
+
+Neurons are connected to each other through synapses. We simulate the synaptic weight $w$ that corresponds to the concentration of a generic neurotransmitter in the synapse in time-steps as well. The value of the weight, $w$, lies between 0 and 1. If the output of neuron $i$ feeds into an input of neuron $j$, the synaptic weight is denoted by $w_{ij}$. When neuron $i$ fires, a fraction of the action potential $w_{ij}/\sum_{k}w_{ik}$ is transmitted to neuron $j$. $k$ is an index that runs over all the other neurons that neuron $i$ feeds into.
+
+The weight of a synapse is reinforced every time a signal passes through it. The reinforcement is implemented as an increase of the weight $w$ by $\alpha(1-w)$. This is a form of Hebbian learning that implements unsupervised learning in the neural network. The weight also decays by a factor of $\beta$ at every time-step.
+
+
