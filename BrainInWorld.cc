@@ -25,6 +25,7 @@ ALL RIGHTS RESERVED
 #include <TCanvas.h>
 #include <TEllipse.h>
 #include <TLine.h>
+#include <TText.h>
 #include <TRandom3.h>
 #include <TTimer.h>
 
@@ -41,6 +42,7 @@ ALL RIGHTS RESERVED
 #include "interface/CommandLineArguments.h"
 
 int skipGenerations=0;
+int endGeneration=1000;
 int timeStep=200;
 double worldSize=100;
 double regenFood=1.0;
@@ -69,6 +71,7 @@ int main(int argc, char *argv[])
   std::map<std::string, int> cmdMap=commandLineArguments(argc, argv);
   if (cmdMap.find("-debug")!=cmdMap.end())           debug=cmdMap["-debug"];
   if (cmdMap.find("-skipGenerations")!=cmdMap.end()) skipGenerations=cmdMap["-skipGenerations"];
+  if (cmdMap.find("-endGeneration")!=cmdMap.end())   endGeneration=cmdMap["-endGeneration"];
   if (cmdMap.find("-timeStep")!=cmdMap.end())        timeStep=cmdMap["-timeStep"];
   if (cmdMap.find("-worldSize")!=cmdMap.end())       worldSize=cmdMap["-worldSize"];
   if (cmdMap.find("-nBots")!=cmdMap.end())           nBots=cmdMap["-nBots"];
@@ -80,7 +83,9 @@ int main(int argc, char *argv[])
   std::cout<<"debug = "<<debug<<std::endl;
   std::cout<<"visualization = "<<decodeDebug(debug, 0)<<std::endl;
   
-  TApplication *myapp=new TApplication("myapp",0,0);
+  // TApplication *myapp=new TApplication("myapp",0,0);
+  gStyle->SetCanvasPreferGL(false);
+  gStyle->SetPalette(1);
   
   typedef std::vector<Bot*> Bots;
   Bots bots;
@@ -117,9 +122,10 @@ int main(int argc, char *argv[])
   std::vector <double> dtime_vector;
   std::vector <double> dtime_predator_vector;
   
-  gStyle->SetPalette(1);
-  
   TCanvas *c_World;
+  TText *text=new TText(0.01, 0.01, "Generation 0");
+  text->SetNDC();
+  text->SetTextFont(42);
   if (decodeDebug(debug, 0)==1)
   {
     c_World=new TCanvas("c_World", "Natural Neural Network in Genetic Algorithm", 700, 700);
@@ -150,7 +156,7 @@ int main(int argc, char *argv[])
   int dtime_predator=0;
   
   // Time loop
-  while (foods.size()>0)
+  while (foods.size()>0 && generations<endGeneration)
   {
     
     ++time;
@@ -277,9 +283,11 @@ int main(int argc, char *argv[])
       for (unsigned int i=0; i<bots.size(); ++i) bots.at(i)->draw();
       for (unsigned int i=0; i<foods.size(); ++i) foods.at(i)->draw();
       for (unsigned int i=0; i<predators.size(); ++i) predators.at(i)->draw();
+      text->SetText(0.01, 0.01, ("Generation "+itoa(generations)).c_str());
+      text->Draw();
       c_World->Update();
       // c_World->SaveAs(("Movie/c_World_"+itoa(time)+".png").c_str());
-      c_World->Print("Movie/Movie.gif+");
+      c_World->Print("Movie/Movie_basic.gif+");
     }
     
     if (decodeDebug(debug, 3)==1 && time%timeStep==0 && generations>skipGenerations) // Flash histograms
@@ -395,6 +403,8 @@ int main(int argc, char *argv[])
       delete h_distances;
     }
   }
+  
+  if (decodeDebug(debug, 0)==1) c_World->Print("Movie/Movie_basic.gif++");
   
   return 0;
 }
