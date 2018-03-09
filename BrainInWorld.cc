@@ -278,7 +278,7 @@ int main(int argc, char *argv[])
       for (unsigned int i=0; i<foods.size(); ++i) foods.at(i)->draw();
       for (unsigned int i=0; i<predators.size(); ++i) predators.at(i)->draw();
       c_World->Update();
-      // c_World->SaveAs(("Movie/c_World_"+itoa(time)+".png").c_str());
+      c_World->SaveAs(("Movie/c_World_"+itoa(time)+".png").c_str());
     }
     
     if (decodeDebug(debug, 3)==1 && time%timeStep==0 && generations>skipGenerations) // Flash histograms
