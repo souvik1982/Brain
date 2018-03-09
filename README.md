@@ -19,8 +19,7 @@
    <tr>
     <td>
      <img src="http://home.fnal.gov/~souvik/Brain/c_World_8920400.png" width="100%" height="100%" style="margin-right: 2em" border="1"/><br/>
-     <i>Bots with 30 neurons each search for and race after "food". <br/>
-      Shown here is their behavior between generations 1000 and 1100.</i>
+     <i>Bots with 30 neurons each search for and race after "food". Shown here is their behavior between generations 1000 and 1100.</i>
     </td>
     <td>
      <img src="http://home.fnal.gov/~souvik/Brain/c_dtime_generation.png" width="100%" height="100%" style="margin-left: 2em" border="1"/><br/>
