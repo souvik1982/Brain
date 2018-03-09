@@ -409,8 +409,9 @@ int main(int argc, char *argv[])
     // c_World->Print("Movie/Movie_basic.gif++");
     delete c_World;
   }
-  
   delete myapp;
+  
+  std::cout<<"Exited program after "<<endGeneration<<" generations as requested."<<std::endl;
   
   return 0;
 }
