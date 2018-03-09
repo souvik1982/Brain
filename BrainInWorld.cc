@@ -286,7 +286,7 @@ int main(int argc, char *argv[])
       text->SetText(0.01, 0.01, ("Generation "+itoa(generations)).c_str());
       text->Draw();
       c_World->Update();
-      // c_World->SaveAs(("Movie/c_World_"+itoa(time)+".png").c_str());
+      c_World->SaveAs(("Movie/c_World_"+itoa(time)+".png").c_str());
       // c_World->Print("Movie/Movie_basic.gif+");
     }
     

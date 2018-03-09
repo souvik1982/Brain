@@ -11,10 +11,14 @@
     I conjecture that evolution sets policy gradients for (genetic) survival over multiple generations. These policy gradients are burned into the network topology. The network topology, in turn, directs (something like) reinforcement learning implemented on synaptic weights such that the individual brain learns to optimize reward during the course of one lifetime.
   </p>
   
+  <p style="margin-left: 10em; margin-right: 10em">
+    <a href="http://home.fnal.gov/~souvik/Brain/index.html"> Animations and more details here. </a>
+  </p>
+  
   <table align="center">
    <tr>
     <td>
-     <img src="http://home.fnal.gov/~souvik/Brain/Movie_basic.gif" width="100%" height="100%" style="margin-right: 2em" border="1"/><br/>
+     <img src="http://home.fnal.gov/~souvik/Brain/c_World_8920400.png" width="100%" height="100%" style="margin-right: 2em" border="1"/><br/>
      <i>Bots with 30 neurons each search for and race after "food". <br/>
       Shown here is their behavior between generations 1000 and 1100.</i>
     </td>
