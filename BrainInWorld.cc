@@ -83,8 +83,8 @@ int main(int argc, char *argv[])
   std::cout<<"debug = "<<debug<<std::endl;
   std::cout<<"visualization = "<<decodeDebug(debug, 0)<<std::endl;
   
-  // TApplication *myapp=new TApplication("myapp",0,0);
-  gStyle->SetCanvasPreferGL(false);
+  TApplication *myapp=new TApplication("myapp",0,0);
+  gStyle->SetCanvasPreferGL(true);
   gStyle->SetPalette(1);
   
   typedef std::vector<Bot*> Bots;
