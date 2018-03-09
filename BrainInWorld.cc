@@ -287,7 +287,7 @@ int main(int argc, char *argv[])
       text->Draw();
       c_World->Update();
       // c_World->SaveAs(("Movie/c_World_"+itoa(time)+".png").c_str());
-      c_World->Print("Movie/Movie_basic.gif+");
+      // c_World->Print("Movie/Movie_basic.gif+");
     }
     
     if (decodeDebug(debug, 3)==1 && time%timeStep==0 && generations>skipGenerations) // Flash histograms
@@ -404,7 +404,13 @@ int main(int argc, char *argv[])
     }
   }
   
-  if (decodeDebug(debug, 0)==1) c_World->Print("Movie/Movie_basic.gif++");
+  if (decodeDebug(debug, 0)==1) 
+  {
+    // c_World->Print("Movie/Movie_basic.gif++");
+    delete c_World;
+  }
+  
+  delete myapp;
   
   return 0;
 }
