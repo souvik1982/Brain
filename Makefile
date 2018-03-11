@@ -6,40 +6,32 @@ all: BrainInWorld
 clean:
 	rm -rf BrainInWorld lib/*.o
 
-BrainInWorld: Neuron.o Brain.o Entity.o Fire.o Food.o Bot.o BrainInWorld.o
+BrainInWorld: lib/Neuron.o lib/Brain.o lib/Entity.o lib/Fire.o lib/Food.o lib/Bot.o lib/BrainInWorld.o
 	c++ lib/Neuron.o lib/Brain.o lib/Entity.o lib/Fire.o lib/Food.o lib/Bot.o lib/BrainInWorld.o -o BrainInWorld $(ROOTFLAGS) $(ROOTLIBS) -O2
 
 TestNeuron: Neuron.o TestNeuron.o
 	c++ lib/Neuron.o lib/TestNeuron.o -o TestNeuron $(ROOTFLAGS) $(ROOTLIBS) -O2
 
-Neuron.o: src/Neuron.cc
-	c++ -c src/Neuron.cc -c $(ROOTFLAGS) -O2
-	mv Neuron.o lib/
+lib/Neuron.o: interface/Neuron.h src/Neuron.cc
+	c++ -c src/Neuron.cc -o lib/Neuron.o -c $(ROOTFLAGS) -O2
 
-Brain.o: src/Brain.cc
-	c++ -c src/Brain.cc -c $(ROOTFLAGS) -O2
-	mv Brain.o lib/
+lib/Brain.o: interface/Brain.h src/Brain.cc
+	c++ -c src/Brain.cc -o lib/Brain.o -c $(ROOTFLAGS) -O2
 
-Entity.o: src/Entity.cc
-	c++ -c src/Entity.cc -c $(ROOTFLAGS) -O2
-	mv Entity.o lib/
+lib/Entity.o: interface/Entity.h src/Entity.cc
+	c++ -c src/Entity.cc -o lib/Entity.o -c $(ROOTFLAGS) -O2
 
-Fire.o: src/Fire.cc
-	c++ -c src/Fire.cc -c $(ROOTFLAGS) -O2
-	mv Fire.o lib/
+lib/Fire.o: interface/Fire.h src/Fire.cc
+	c++ -c src/Fire.cc -o lib/Fire.o -c $(ROOTFLAGS) -O2
 
-Food.o: src/Food.cc
-	c++ -c src/Food.cc -c $(ROOTFLAGS) -O2
-	mv Food.o lib/
+lib/Food.o: interface/Food.h src/Food.cc
+	c++ -c src/Food.cc -o lib/Food.o -c $(ROOTFLAGS) -O2
 
-Bot.o: src/Bot.cc
-	c++ -c src/Bot.cc -c $(ROOTFLAGS) -O2
-	mv Bot.o lib/
+lib/Bot.o: interface/Bot.h src/Bot.cc
+	c++ -c src/Bot.cc -o lib/Bot.o -c $(ROOTFLAGS) -O2
 
-BrainInWorld.o: BrainInWorld.cc
-	c++ -c BrainInWorld.cc -c $(ROOTFLAGS) -O2
-	mv BrainInWorld.o lib/
+lib/BrainInWorld.o: BrainInWorld.cc
+	c++ -c BrainInWorld.cc -o lib/BrainInWorld.o -c $(ROOTFLAGS) -O2
 
-TestNeuron.o: test/TestNeuron.cc
-	c++ -c test/TestNeuron.cc -c $(ROOTFLAGS) -O2
-	mv TestNeuron.o lib/ 
+lib/TestNeuron.o: test/TestNeuron.cc
+	c++ -c test/TestNeuron.cc -o lib/TestNeuron.o -c $(ROOTFLAGS) -O2
