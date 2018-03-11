@@ -52,25 +52,13 @@ void Neuron::stepInTime1(Neurons *neurons)
     for (unsigned int i=0; i<neuralRelations_.size(); ++i) totalSynapticWeight+=neuralRelations_.at(i)->synapticStrength;
     for (unsigned int i=0; i<neuralRelations_.size(); ++i)
     {
-      NeuralRelation *neuralRelation=neuralRelations_.at(i);
-      if (neuralRelation->distance!=0)
-      {
-        Neuron *targetNeuron=neurons->at(neuralRelation->index);
-        neuralRelation->synapticStrength=neuralRelation->synapticStrength/totalSynapticWeight; // re-normalize the synaptic strength
-        targetNeuron->receive(0.5*(neuralRelation->synapticStrength)*(neuralRelation->distance));
-        targetNeuron->v_firedAtThis_.push_back(neuralRelation);
-      }
+      Neuron *targetNeuron=neurons->at(neuralRelations_.at(i)->index);
+      double synapticStrength=neuralRelations_.at(i)->synapticStrength;
+      targetNeuron->receive(0.5*(synapticStrength/totalSynapticWeight)*(neuralRelations_.at(i)->distance));
+      neuralRelations_.at(i)->synapticStrength=synapticStrength+synapticReinforcement_*(1.-synapticStrength);
     }
-    potential_=0; // -0.01 for quasi-biological refraction
-    // Hebbian reinforcement
-    for (unsigned int i=0; i<v_firedAtThis_.size(); ++i)
-    {
-      NeuralRelation *neuralRelation=v_firedAtThis_.at(i);
-      double synapticStrength=neuralRelation->synapticStrength;
-      neuralRelation->synapticStrength=synapticStrength+synapticReinforcement_*(1.-synapticStrength);
-    }
-
-    v_firedAtThis_.clear();
+    potential_=0; // -0.01;
+    // std::cout<<"Neuron fired"<<std::endl;
   }
   else
   {

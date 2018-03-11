@@ -39,7 +39,6 @@ class Neuron
     double potential_buffer_;
     double spontaneousRate_;
     NeuralRelations neuralRelations_;
-    NeuralRelations v_firedAtThis_;
     
   public:
   
