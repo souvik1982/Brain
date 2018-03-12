@@ -280,7 +280,7 @@ int main(int argc, char *argv[])
     }
     
     // Draw visualization
-    if (decodeDebug(debug, 0)==1 && time%timeStep==0 && generations>skipGenerations)
+    if (decodeDebug(debug, 0)==1 && ((time%timeStep==0 && generations>skipGenerations) || time==1))
     {
       c_World->cd();
       for (unsigned int i=0; i<bots.size(); ++i) bots.at(i)->draw();
@@ -412,7 +412,7 @@ int main(int argc, char *argv[])
   
   if (decodeDebug(debug, 0)==1) 
   {
-    // c_World->Print("Movie/Movie_basic.gif++");
+    c_World->Print("Movie/Movie_basic.gif++");
     delete c_World;
   }
   
