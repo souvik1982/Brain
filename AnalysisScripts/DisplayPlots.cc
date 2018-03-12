@@ -55,7 +55,7 @@ void DisplayPlots(std::string filename)
     g_dtime_generation->GetPoint(i, x, y);
     h_dtime_generation->Fill(x, y);
   }
-  int rebin=100;
+  int rebin=1000;
   h_dtime_generation->Rebin(rebin);
   h_dtime_generation->Scale(1./double(rebin));
   h_dtime_generation->SetLineColor(kBlue);
@@ -111,12 +111,12 @@ void DisplayPlots(std::string filename)
   
   // h_distances->SetBinContent(1, 0);
   // h_distances->SetBinContent(2, 0);
-  TCanvas *c_distances=new TCanvas("c_distances", "c_distances", 700, 700);
+  /*TCanvas *c_distances=new TCanvas("c_distances", "c_distances", 700, 700);
   h_distances->Draw("colz");
   leg=new TLegend(0.1, 0.9, 0.9, 1.0);
   leg->AddEntry(h_distances, "AI Brain", ""); leg->SetLineColor(kWhite); leg->SetFillColor(kWhite);
   leg->Draw();
-  c_distances->SaveAs("c_distances.png");
+  c_distances->SaveAs("c_distances.png");*/
 }
 
   

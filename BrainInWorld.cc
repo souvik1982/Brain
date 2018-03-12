@@ -46,6 +46,7 @@ int endGeneration=1000;
 int timeStep=200;
 double worldSize=100;
 double regenFood=1.0;
+int seed=100;
 
 unsigned int nFoods=5;
 unsigned int nBots=10;
@@ -66,7 +67,7 @@ double mu_visualAngle=0.05;
 int debug = 0x2;
 
 int main(int argc, char *argv[])
-{ 
+{
   // Get command line arguments
   std::map<std::string, int> cmdMap=commandLineArguments(argc, argv);
   if (cmdMap.find("-debug")!=cmdMap.end())           debug=cmdMap["-debug"];
@@ -77,8 +78,9 @@ int main(int argc, char *argv[])
   if (cmdMap.find("-nBots")!=cmdMap.end())           nBots=cmdMap["-nBots"];
   if (cmdMap.find("-nFoods")!=cmdMap.end())          nFoods=cmdMap["-nFoods"];
   if (cmdMap.find("-nPredators")!=cmdMap.end())      nPredators=cmdMap["-nPredators"];
+  if (cmdMap.find("-seed")!=cmdMap.end())            seed=cmdMap["-seed"];
 
-  r3->SetSeed(100);
+  r3->SetSeed(seed);
   
   std::cout<<"debug = "<<debug<<std::endl;
   std::cout<<"visualization = "<<decodeDebug(debug, 0)<<std::endl;
@@ -124,10 +126,13 @@ int main(int argc, char *argv[])
   
   TCanvas *c_World;
   TText *text=new TText(0.01, 0.01, "Generation 0");
+  text=new TText(0.01, 0.01, "Generation 0");
   text->SetNDC();
   text->SetTextFont(42);
   if (decodeDebug(debug, 0)==1)
   {
+    gStyle->SetCanvasPreferGL(true);
+    gStyle->SetPalette(1);
     c_World=new TCanvas("c_World", "Natural Neural Network in Genetic Algorithm", 700, 700);
     // Safety Circle
     // TEllipse *e_safe=new TEllipse(worldSize/2., worldSize/2., 70, 70);
@@ -286,7 +291,7 @@ int main(int argc, char *argv[])
       text->SetText(0.01, 0.01, ("Generation "+itoa(generations)).c_str());
       text->Draw();
       c_World->Update();
-      c_World->SaveAs(("Movie/c_World_"+itoa(time)+".png").c_str());
+      // c_World->SaveAs(("Movie/c_World_"+itoa(time)+".png").c_str());
       // c_World->Print("Movie/Movie_basic.gif+");
     }
     
@@ -409,10 +414,11 @@ int main(int argc, char *argv[])
     // c_World->Print("Movie/Movie_basic.gif++");
     delete c_World;
   }
-  delete myapp;
   
   std::cout<<"Exited program after "<<endGeneration<<" generations as requested."<<std::endl;
   
+  delete text;
+  delete myapp;
   return 0;
 }
     
