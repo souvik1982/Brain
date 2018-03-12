@@ -131,8 +131,6 @@ int main(int argc, char *argv[])
   text->SetTextFont(42);
   if (decodeDebug(debug, 0)==1)
   {
-    gStyle->SetCanvasPreferGL(true);
-    gStyle->SetPalette(1);
     c_World=new TCanvas("c_World", "Natural Neural Network in Genetic Algorithm", 700, 700);
     // Safety Circle
     // TEllipse *e_safe=new TEllipse(worldSize/2., worldSize/2., 70, 70);
@@ -378,7 +376,11 @@ int main(int argc, char *argv[])
       }
       
       TFile *file;
-      if (generations==100) file=new TFile("AnalyzeThis.root", "recreate");
+      if (generations==100) 
+      {
+        file=new TFile("AnalyzeThis.root", "recreate");
+        file->mkdir("Brain");
+      }
       else file=new TFile("AnalyzeThis.root", "update");
       g_avgBrainSize_time->Write(g_avgBrainSize_time->GetName(), 5 );
       g_avgBrainSize_generation->Write(g_avgBrainSize_generation->GetName(), 5 );
@@ -388,7 +390,6 @@ int main(int argc, char *argv[])
       g_avgBrainSize_predator_generation->Write(g_avgBrainSize_predator_generation->GetName(), 5 );
       g_dtime_predator_generation->Write(g_dtime_predator_generation->GetName(), 5 );
       g_dtime_predator_time->Write(g_dtime_predator_time->GetName(), 5 );
-      file->mkdir("Brain");
       file->cd("Brain");
       h_spontaneity->Write();
       h_distances->Write();
